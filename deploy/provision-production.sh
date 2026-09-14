@@ -578,15 +578,21 @@ cat <<EOF
     makes those backups readable, and it lives on the machine they protect.
 
  3. Test that mail actually leaves, before it is an invitation to a student:
-       cd $APP_DIR/backend && node scripts/check-mail.mjs $ADMIN_EMAIL
+       cd $APP_DIR/backend && sudo -u $APP_USER node --env-file=$ENV_FILE \\
+         scripts/check-mail.mjs $ADMIN_EMAIL
 
- 4. Create the first platform administrator:
-       cd $APP_DIR/backend && node scripts/create-super-admin.mjs
+ 4. Create the first platform administrator. The password is generated, shown
+    once, and stored only as a hash — write it down before closing the terminal:
+       cd $APP_DIR/backend && sudo -u $APP_USER node --env-file=$ENV_FILE \\
+         scripts/create-super-admin.mjs $ADMIN_EMAIL "Platform administrator"
 
- 5. Switch on weekly machine snapshots in Hostinger's panel. Nothing on this
-    host can do that, and they answer the failure the dump cannot.
+ 5. Switch on weekly machine snapshots in your provider's panel. Nothing on
+    this host can do that, and they answer the failure the dump cannot.
 
  Deploys are manual on purpose:
-       ssh $APP_USER@$DOMAIN 'bash $APP_DIR/deploy/deploy-production.sh production'
+       ssh $APP_USER@$DOMAIN 'bash $APP_DIR/deploy/deploy-production.sh'
+
+ The whole path, with the parts that are not commands:
+       https://riseproject.space/setup
 ============================================================================
 EOF

@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Setup guide — RISE</title>
+<meta name="description" content="How to take a bare virtual machine to a working RISE installation: DNS, one provisioning script, the four secrets it cannot invent, the first administrator, and a school's first interview." />
+<style>
+:root{
+  color-scheme:light;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;color:#131b2e;background:#faf8ff;-webkit-font-smoothing:antialiased;
+  --background:#faf8ff;--surface:#fff;--surface-low:#f2f3ff;--surface-container:#eaedff;
+  --text:#131b2e;--text-muted:#424654;--outline:#c3c6d6;--outline-strong:#737785;
+  --primary:#0040a1;--primary-bright:#0056d2;--primary-soft:#dae2ff;
+  --success:#067047;--warning:#92400e;
+  --eu-blue:#003399;--eu-gold:#FFCC00;
+  --shadow:0 2px 14px rgba(19,27,46,.06);--radius:8px;--radius-lg:16px;--page-max:1080px;
+}
+*{box-sizing:border-box}
+body{margin:0;
+  background:linear-gradient(180deg,rgba(218,226,255,.55) 0,rgba(250,248,255,0) 420px),var(--background);}
+.wrap{max-width:var(--page-max);margin:0 auto;padding:0 24px}
+a{color:var(--primary)}
+h1{font-size:clamp(30px,4.4vw,42px);line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:0 0 16px}
+h2{font-size:clamp(21px,3vw,26px);line-height:1.25;font-weight:650;margin:0 0 12px}
+h3{font-size:16px;font-weight:700;margin:0 0 6px}
+p{margin:0 0 14px;font-size:17px}
+.muted{color:var(--text-muted)}
+
+header.top{padding:34px 0 0}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.rise-logo{width:132px;height:auto;color:#1d1d1b;display:block}
+.nav{display:flex;gap:22px;font-size:15px;font-weight:600;flex-wrap:wrap}
+.nav a{text-decoration:none;color:var(--text-muted)}
+.nav a:hover{color:var(--primary)}
+.nav a.here{color:var(--primary)}
+
+.hero{padding:48px 0 8px}
+.hero .lede{font-size:20px;color:var(--text-muted);max-width:64ch;margin:0 0 22px}
+
+/* the guide body is a reading column, not a full-width grid */
+.col{max-width:74ch}
+.col p,.col li{font-size:16.5px}
+.col h2{margin-top:6px}
+.col h3{margin-top:22px;font-size:17px}
+.col ul,.col ol{padding-left:22px;color:var(--text)}
+.col li{margin:7px 0}
+
+section{padding:30px 0}
+.section-lede{color:var(--text-muted);max-width:66ch}
+
+/* numbered steps */
+.stepno{display:flex;align-items:baseline;gap:12px;margin:46px 0 14px;
+  border-top:1px solid rgba(195,198,214,.7);padding-top:26px}
+.stepno:first-of-type{border-top:0;padding-top:0;margin-top:26px}
+.stepno .n{flex:0 0 auto;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--primary);background:var(--primary-soft);border-radius:999px;padding:4px 11px;line-height:1}
+.stepno h2{margin:0}
+
+/* code */
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;
+  background:var(--surface-low);padding:2px 6px;border-radius:4px}
+pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;line-height:1.6;
+  background:#0f1729;color:#dfe5f5;border-radius:var(--radius);padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre .c{color:#8b9bc4}
+pre .v{color:#ffd479}
+pre.out{background:var(--surface-low);color:var(--text-muted);border:1px solid rgba(195,198,214,.7)}
+
+/* callouts */
+.note{border:1px solid rgba(195,198,214,.7);border-left:3px solid var(--primary);
+  background:var(--surface);box-shadow:var(--shadow);border-radius:var(--radius-lg);
+  padding:16px 20px;margin:0 0 18px}
+.note p:last-child{margin-bottom:0}
+.note.warn{border-left-color:var(--warning);background:#fffbf2}
+.note.warn strong{color:var(--warning)}
+.note .lbl{display:block;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--primary);margin-bottom:6px}
+.note.warn .lbl{color:var(--warning)}
+
+/* the shopping list */
+.need{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:20px 0 6px}
+.need div{border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);background:var(--surface);
+  box-shadow:var(--shadow);padding:18px 20px}
+.need h3{color:var(--primary);margin-bottom:4px}
+.need p{font-size:14.5px;color:var(--text-muted);margin:0}
+.need .price{display:block;margin-top:8px;font-size:12px;font-weight:800;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--outline-strong)}
+
+table.kv{border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px}
+table.kv th,table.kv td{text-align:left;vertical-align:top;padding:9px 12px 9px 0;
+  border-bottom:1px solid rgba(195,198,214,.6)}
+table.kv th{font-weight:700;white-space:nowrap;width:1%;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:13.5px;color:var(--primary)}
+table.kv td{color:var(--text-muted)}
+.scroll{overflow-x:auto}
+
+/* funding */
+.funding{border-top:1px solid rgba(195,198,214,.6);margin-top:24px;padding:34px 0 60px}
+.funding .row{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.eu-emblem{flex:0 0 auto;width:126px}
+.funding p{font-size:14px;color:var(--text-muted);max-width:70ch;margin:0 0 10px}
+.funding .grant{font-size:13px;color:var(--outline-strong)}
+footer{border-top:1px solid rgba(195,198,214,.6);padding:22px 0 60px;font-size:13.5px;color:var(--text-muted)}
+footer .wrap{display:flex;gap:18px;justify-content:space-between;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a href="/" aria-label="RISE — home"><svg class="rise-logo" id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250.59 150.46">
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <path fill="currentColor" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+      <rect fill="currentColor" x="88.84" y="41.64" width="17.85" height="65.74"/>
+      <path fill="currentColor" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+      <polygon fill="currentColor" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+      <path fill="currentColor" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+    </g>
+  </g>
+</svg></a>
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/prd">Requirements</a>
+    <a href="/architecture">Architecture</a>
+    <a href="/design">Design</a>
+    <a href="/setup" class="here">Setup guide</a>
+  </nav>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <h1>Run your own copy</h1>
+  <p class="lede">From an empty virtual machine to a student sitting their first interview. About an
+  hour of work, most of it spent waiting for packages to install and for DNS to propagate.</p>
+</div></section>
+
+<div class="wrap"><div class="col">
+
+<div class="note">
+  <span class="lbl">Before you read further</span>
+  <p>Every command on this page was run, in this order, against a machine that started empty. The
+  outputs shown are real. Where something went wrong the first time, this guide says so rather than
+  pretending the path was clean.</p>
+</div>
+
+<h2>What you need first</h2>
+<p>Five things, and the platform can produce none of them for you. Get them before you start — the
+provisioning script stops and tells you what is missing, but it is a duller hour if you collect them
+as you go.</p>
+
+<div class="need">
+  <div>
+    <h3>A server</h3>
+    <p>Debian&nbsp;12 or Ubuntu&nbsp;22.04 and newer, 2&nbsp;GB of memory, root access over SSH with
+    a key. Any provider. Nothing here is specific to one.</p>
+    <span class="price">≈ €5 / month</span>
+  </div>
+  <div>
+    <h3>A name for it</h3>
+    <p>A domain or subdomain you control the DNS for. <code>rise.your-school.example</code> is
+    perfectly good; it does not need its own domain.</p>
+    <span class="price">≈ €10 / year</span>
+  </div>
+  <div>
+    <h3>A mailbox to send from</h3>
+    <p>Any SMTP server. Prefer the school's own: an invitation asking a student to set a password
+    should arrive from an address they already recognise.</p>
+    <span class="price">Usually already have one</span>
+  </div>
+  <div>
+    <h3>A language model key</h3>
+    <p>Scaleway's Generative APIs by default — the model runs in Paris, so no student answer leaves
+    the EU. Billed per token, not per seat.</p>
+    <span class="price">≈ €0.01 per interview</span>
+  </div>
+  <div>
+    <h3>A Google service account</h3>
+    <p><em>Optional.</em> Only if teachers will author interviews in Google&nbsp;Sheets. Content can
+    be imported from CSV instead.</p>
+    <span class="price">Free</span>
+  </div>
+</div>
+
+<p class="muted" style="font-size:14.5px">On the per-interview figure: at Scaleway's list price the
+default model costs €0.25 per million tokens in and €1.50 per million out, and a ten-question
+interview — each answer scored against its rubric, plus a closing summary — comes to roughly one
+euro cent. You do not have to take that on trust. The platform records the token count and the
+computed cost of every single model call, so after a week of real use you can read your own number
+instead of ours.</p>
+
+<div class="stepno"><span class="n">Step 1</span><h2>Point the name at the machine</h2></div>
+
+<p>Do this first and do it before anything else, because the provisioning script asks a certificate
+authority to verify the name — and that check fails, irreversibly for an hour or so, if the name does
+not yet resolve to this machine.</p>
+
+<p>At your DNS provider, one record:</p>
+
+<div class="scroll"><table class="kv">
+  <tr><th>Type</th><td>A</td></tr>
+  <tr><th>Name</th><td><code>rise</code> — or <code>@</code> if you are using a whole domain</td></tr>
+  <tr><th>Value</th><td>the server's IPv4 address</td></tr>
+  <tr><th>TTL</th><td>whatever the default is</td></tr>
+</table></div>
+
+<p>Then wait, and check from somewhere that is not your own laptop — your laptop may have cached the
+answer from before the record existed:</p>
+
+<pre><code>dig +short rise.your-school.example</code></pre>
+
+<p>When that prints your server's address, carry on. If it prints nothing after twenty minutes, the
+record is wrong somewhere; no amount of waiting fixes a typo.</p>
+
+<div class="stepno"><span class="n">Step 2</span><h2>Run the provisioning script</h2></div>
+
+<p>One script takes the machine from nothing to a running installation: system packages, an
+unprivileged deploy user, PostgreSQL, the application under systemd, nginx, a TLS certificate that
+renews itself, log rotation, and a daily database backup.</p>
+
+<p>Fetch it and read it before you run it. It runs as root, it is 590 lines, and every section says
+what it is about to do and why.</p>
+
+<pre><code><span class="c"># on the server, as root</span>
+curl -fsSLO https://raw.githubusercontent.com/tehnickazr/RISE-Project/main/deploy/provision-production.sh
+less provision-production.sh</code></pre>
+
+<div class="note warn">
+  <span class="lbl">Set your own domain</span>
+  <p>The script's built-in defaults are <em>ours</em> — <code>app.riseproject.space</code>, and our
+  repository. Left alone it will cheerfully request a certificate for a name you do not own and fail.
+  <strong>Pass <code>RISE_DOMAIN</code>.</strong></p>
+</div>
+
+<pre><code>RISE_DOMAIN=rise.your-school.example \
+RISE_ADMIN_EMAIL=admin@your-school.example \
+bash provision-production.sh</code></pre>
+
+<p>Four environment variables change its behaviour. The rest is fixed on purpose, so that two
+installations look the same when something needs debugging:</p>
+
+<div class="scroll"><table class="kv">
+  <tr><th>RISE_DOMAIN</th><td>The hostname the platform answers on. Always set this.</td></tr>
+  <tr><th>RISE_ADMIN_EMAIL</th><td>Where the certificate authority sends expiry warnings, and the default from-address for mail.</td></tr>
+  <tr><th>RISE_REPO</th><td>A different clone URL — your own fork, for instance.</td></tr>
+  <tr><th>RISE_BRANCH</th><td>A branch other than <code>main</code>.</td></tr>
+</table></div>
+
+<p>It takes about eight minutes, nearly all of it <code>apt</code>. It prints every step, and it says
+what it <em>skipped</em> as clearly as what it did — because it is designed to be run again. Run it a
+second time after fixing something and it will not overwrite the database, the environment file, or
+the certificate.</p>
+
+<div class="note">
+  <span class="lbl">What it deliberately will not do</span>
+  <p>It does not invent the secrets you have to obtain, it does not create the first administrator,
+  and it does not switch on automatic deployment. A script that wrote plausible-looking placeholder
+  keys would hand you a server that starts and then fails at the first interview, which is a worse
+  failure than one that refuses to start.</p>
+</div>
+
+<p>It ends by printing what still needs a human. That list is the rest of this page.</p>
+
+<div class="stepno"><span class="n">Step 3</span><h2>Fill in the four secrets</h2></div>
+
+<p>The environment file lives at <code>/opt/apps/rise/shared/.env</code>, owned by the
+<code>deploy</code> user and readable by nobody else. It is outside the application directory
+deliberately: a deploy replaces the checkout, and the secrets must survive that.</p>
+
+<pre><code>ssh root@rise.your-school.example
+nano /opt/apps/rise/shared/.env</code></pre>
+
+<p>Everything that could be generated already has been — the session secret, the database password,
+the public origin. Four lines are marked <code>NEEDS VALUE</code>.</p>
+
+<h3>SCW_SECRET_KEY — the language model</h3>
+<p>In the Scaleway console: <strong>Identity and Access Management → API keys → Generate an API
+key</strong>. Name it for this server, so that revoking it later is not an act of archaeology.</p>
+<ul>
+  <li>Only the <strong>secret key</strong> matters. The access key, the project ID and the
+  organisation ID belong to other Scaleway products and the platform never reads them.</li>
+  <li>It is shown <strong>once</strong>. Paste it straight into the environment file.</li>
+  <li><strong>Note the expiry date in a calendar.</strong> Many organisations cap key lifetime at one
+  year, and an expired key does not degrade gracefully — every interview simply stops working, on a
+  Tuesday, a year after you have forgotten doing this.</li>
+</ul>
+
+<h3>SMTP_PASS — and the three lines above it</h3>
+<p>The script fills the mail settings with the defaults for the host we used. If your mail is
+elsewhere, correct <code>SMTP_HOST</code>, <code>SMTP_PORT</code> and <code>SMTP_USER</code> as well
+as the password. Port 587 is STARTTLS, 465 is implicit TLS; the platform infers which from the port.
+Port 25 is blocked outbound by nearly every provider and will only ever time out.</p>
+
+<div class="note warn">
+  <span class="lbl">Quote the password</span>
+  <p>This cost us an afternoon. Mail passwords often contain <code>|</code>, <code>&amp;</code>,
+  <code>$</code> or <code>#</code>. systemd reads this file literally and does not care — but the
+  deploy script reads it with <code>source</code>, where an unquoted <code>|</code> is a pipe and the
+  rest of the password is a command. Write
+  <code>SMTP_PASS='the-password'</code>, in single quotes, always.</p>
+</div>
+
+<h3>GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_PRIVATE_KEY</h3>
+<p>Only if teachers will author content in Google Sheets. Create a service account in the Google
+Cloud console, enable the Sheets API, download a JSON key, and share each school's spreadsheet with
+the service account's address as <strong>Viewer</strong> — the platform never writes to a sheet.
+Leave both blank to start with; content imports from CSV without them.</p>
+
+<p>Then restart, and confirm it came back:</p>
+
+<pre><code>systemctl restart rise
+systemctl status rise --no-pager</code></pre>
+
+<div class="stepno"><span class="n">Step 4</span><h2>Prove that mail leaves the building</h2></div>
+
+<p>Do this before mail is an invitation to a fourteen-year-old. The usual failure is not a wrong
+password but a blocked port, and from your laptop the two look identical — which is why this runs on
+the server.</p>
+
+<pre><code>cd /opt/apps/rise/current/backend
+sudo -u deploy node --env-file=/opt/apps/rise/shared/.env \
+  scripts/check-mail.mjs you@your-school.example</code></pre>
+
+<p>It prints the configuration it resolved, opens the connection, authenticates, and sends one plain
+message. Go and look in the inbox. <em>And in the spam folder</em> — if it landed there, fix SPF and
+DKIM on the sending domain now, because invitations that go to spam are indistinguishable from
+invitations that were never sent, and you will spend a week not knowing which.</p>
+
+<div class="stepno"><span class="n">Step 5</span><h2>Create the first administrator</h2></div>
+
+<p>There is no default account and no default password. One is generated here, shown once, and stored
+only as a hash — which is also why this is a command and not a line in the database schema, where a
+password would live in version control forever.</p>
+
+<pre><code>cd /opt/apps/rise/current/backend
+sudo -u deploy node --env-file=/opt/apps/rise/shared/.env \
+  scripts/create-super-admin.mjs admin@your-school.example "Platform administrator"</code></pre>
+
+<pre class="out"><code>  super administrator created
+  ---------------------------
+  email    admin@your-school.example
+  password Xq4t9Fbn2wKpLmR7vZ
+
+  Shown once. Change it after signing in.</code></pre>
+
+<p>Write it down before you close the terminal. There is no second copy. The way back, if you lose
+it, is a password-reset link to that mailbox — which is one more reason step 4 comes before this
+one.</p>
+
+<div class="note">
+  <span class="lbl">What this account can and cannot do</span>
+  <p>It creates schools and invites their administrators. It <strong>cannot read a single student's
+  transcript</strong>, at any school, ever — not because it is forbidden by a permission check, but
+  because no endpoint exists that would return one. The same is true of the school's own
+  administrator. Only the student, and teachers at that student's own school, can see an
+  interview.</p>
+</div>
+
+<div class="stepno"><span class="n">Step 6</span><h2>Create the school</h2></div>
+
+<p>Everything from here happens in a browser. Sign in at
+<code>https://rise.your-school.example</code> and change that generated password on the account page
+straight away.</p>
+
+<ol>
+  <li><strong>Create the organisation.</strong> Name, country, and a default language — the default
+  language is what invitations are written in, so it is worth getting right rather than fixing
+  thirty times.</li>
+  <li><strong>Invite its administrator</strong> from the organisation's row. This is the first real
+  message the platform sends to a real person.</li>
+  <li><strong>Set the platform support contact</strong> while you are here. Until it is set, the help
+  page a student sees carries only their school's entry.</li>
+</ol>
+
+<p>Then sign out, open the invitation, and set the password as that school administrator. It is
+tempting to skip this and stay signed in as the platform administrator — don't. It is the exact path
+every teacher will take, and it is the one most likely to have a rough edge on your particular mail
+setup.</p>
+
+<div class="stepno"><span class="n">Step 7</span><h2>Give it something to interview about</h2></div>
+
+<p>An installation with no content is a working installation with nothing to do. As the school's
+administrator, in <strong>Settings</strong>:</p>
+
+<ul>
+  <li><strong>Content source</strong> — point the school at its own spreadsheet and press import.
+  Four tabs: <code>scenarios</code>, <code>questions</code>, <code>rubrics</code>,
+  <code>glossary</code>. Start from the sample CSVs in <a
+  href="https://github.com/tehnickazr/RISE-Project/tree/main/seed/sheets"><code>seed/sheets/</code></a>
+  — four trades, five questions each — and replace them with your own.</li>
+  <li><strong>Privacy notice</strong> — the school's own controller, data protection officer, lawful
+  basis and retention periods. Until these are filled in the gaps are visible in the notice students
+  read, which is deliberate.</li>
+  <li><strong>Help and contacts</strong> — who a student writes to when something breaks.</li>
+</ul>
+
+<p>Editing the spreadsheet changes nothing until somebody presses import. That is what stops a
+half-finished edit reaching a class mid-lesson. Imports are versioned, and every interview records
+the version it was taken against, so changing a question can never alter an interview already
+sat.</p>
+
+<div class="stepno"><span class="n">Step 8</span><h2>Three things before students arrive</h2></div>
+
+<p>A daily backup is already running — the script took one during provisioning and repeats it at
+02:30. It writes to <code>/var/backups/rise</code> on this machine, which answers <em>somebody
+deleted the wrong class on Tuesday</em>. It does not answer <em>the disk died</em>, because the
+database and every dump are on that same disk.</p>
+
+<h3>1. Add an off-site copy</h3>
+<p>Put any S3-compatible bucket in <code>/etc/rise/backup.env</code> and run it once by hand. Backups
+are encrypted on this machine before they leave it, so the storage provider never holds anything
+readable.</p>
+<pre><code>nano /etc/rise/backup.env
+/usr/local/bin/rise-backup &amp;&amp; restic snapshots</code></pre>
+<p>Use a key that can <strong>write but not delete</strong>. A server able to destroy its own backup
+history is one bad command away from having none.</p>
+
+<div class="note warn">
+  <span class="lbl">Then copy the password off the server</span>
+  <p><code>RESTIC_PASSWORD</code> in that same file was generated during provisioning, and it is the
+  only thing that makes those backups readable — including by you. It currently lives on the machine
+  the backups exist to protect. Put it in a password manager now.</p>
+</div>
+
+<h3>2. Switch on machine snapshots</h3>
+<p>In your hosting provider's panel, weekly at least. Nothing running on the host can do this for
+itself, and it answers the failure a database dump cannot: the machine you restore <em>onto</em>.</p>
+
+<h3>3. Check that yesterday's backup happened</h3>
+<p>Not today's — you just watched today's. The one that ran unattended.</p>
+<pre><code>systemctl list-timers rise-backup --no-pager
+tail /var/log/rise/backup.log</code></pre>
+
+<div class="stepno"><span class="n">After</span><h2>Deploying changes</h2></div>
+
+<p>Once it is running, updating is one command, run deliberately by a person:</p>
+
+<pre><code>ssh deploy@rise.your-school.example \
+  'bash /opt/apps/rise/current/deploy/deploy-production.sh'</code></pre>
+
+<p>It pulls, installs, builds the frontend, applies any pending database migrations and restarts the
+service. There is a timer in the repository that would do this every minute, and it is
+<strong>left switched off</strong> on a production host on purpose: on a machine holding interview
+transcripts, what is running should change because somebody decided it should.</p>
+
+<h3>When something is wrong</h3>
+<div class="scroll"><table class="kv">
+  <tr><th>journalctl -u rise -n 100</th><td>Why the service will not start. Start here, always.</td></tr>
+  <tr><th>tail -f /var/log/rise/app.log</th><td>What the application is doing while a student uses it.</td></tr>
+  <tr><th>nginx -t</th><td>After touching a vhost, before reloading and finding out the hard way.</td></tr>
+  <tr><th>certbot certificates</th><td>What is issued and when it expires. Renewal is automatic; verifying it happened is not.</td></tr>
+</table></div>
+
+<p>Three failures account for most of what goes wrong on a first install: a TLS certificate that was
+never issued because DNS had not propagated when the script ran <em>(fix the record, run the script
+again — it is safe)</em>; mail that authenticates but is silently filed as spam <em>(SPF and
+DKIM)</em>; and a language-model key that was pasted with a trailing newline or a wrapped line
+<em>(the platform starts fine and fails at the first answer)</em>.</p>
+
+<h2 style="margin-top:44px">If you get stuck</h2>
+<p>The <a href="/architecture">architecture document</a> covers tenancy, auditing and retention —
+the sections your data protection officer will ask about. Questions, corrections and patches are
+welcome at <a href="https://github.com/tehnickazr/RISE-Project">the repository</a>; if a step on this
+page did not work for you, that is a bug in the page and worth reporting as one.</p>
+
+<p class="muted" style="font-size:14.5px;margin-top:26px">The platform is licensed under the
+<a href="https://github.com/tehnickazr/RISE-Project/blob/main/LICENSE">EUPL&nbsp;1.2</a>. You may run
+it, change it and give it to anyone. If you distribute a modified version, that version stays under
+the same licence — work paid for once with public money should not quietly become somebody's closed
+product.</p>
+
+</div></div>
+
+<div class="funding"><div class="wrap"><div class="row">
+  <svg class="eu-emblem" viewBox="0 0 810 540" role="img"
+       aria-label="Flag of the European Union">
+    <!-- Drawn to the published specification: 3:2 flag; twelve stars on a
+         circle of radius H/3, one at each hour position, each star's points on
+         a circle of radius H/18, one point vertical. Generated, not traced. -->
+    <rect width="810" height="540" fill="#003399"/>
+    <g fill="#FFCC00">
+      <polygon points="405.00,60.00 411.74,80.73 433.53,80.73 415.90,93.54 422.63,114.27 405.00,101.46 387.37,114.27 394.10,93.54 376.47,80.73 398.26,80.73"/>
+      <polygon points="495.00,84.12 501.74,104.84 523.53,104.84 505.90,117.66 512.63,138.39 495.00,125.57 477.37,138.39 484.10,117.66 466.47,104.84 488.26,104.84"/>
+      <polygon points="560.88,150.00 567.62,170.73 589.42,170.73 571.78,183.54 578.52,204.27 560.88,191.46 543.25,204.27 549.99,183.54 532.35,170.73 554.15,170.73"/>
+      <polygon points="585.00,240.00 591.74,260.73 613.53,260.73 595.90,273.54 602.63,294.27 585.00,281.46 567.37,294.27 574.10,273.54 556.47,260.73 578.26,260.73"/>
+      <polygon points="560.88,330.00 567.62,350.73 589.42,350.73 571.78,363.54 578.52,384.27 560.88,371.46 543.25,384.27 549.99,363.54 532.35,350.73 554.15,350.73"/>
+      <polygon points="495.00,395.88 501.74,416.61 523.53,416.61 505.90,429.43 512.63,450.16 495.00,437.34 477.37,450.16 484.10,429.43 466.47,416.61 488.26,416.61"/>
+      <polygon points="405.00,420.00 411.74,440.73 433.53,440.73 415.90,453.54 422.63,474.27 405.00,461.46 387.37,474.27 394.10,453.54 376.47,440.73 398.26,440.73"/>
+      <polygon points="315.00,395.88 321.74,416.61 343.53,416.61 325.90,429.43 332.63,450.16 315.00,437.34 297.37,450.16 304.10,429.43 286.47,416.61 308.26,416.61"/>
+      <polygon points="249.12,330.00 255.85,350.73 277.65,350.73 260.01,363.54 266.75,384.27 249.12,371.46 231.48,384.27 238.22,363.54 220.58,350.73 242.38,350.73"/>
+      <polygon points="225.00,240.00 231.74,260.73 253.53,260.73 235.90,273.54 242.63,294.27 225.00,281.46 207.37,294.27 214.10,273.54 196.47,260.73 218.26,260.73"/>
+      <polygon points="249.12,150.00 255.85,170.73 277.65,170.73 260.01,183.54 266.75,204.27 249.12,191.46 231.48,204.27 238.22,183.54 220.58,170.73 242.38,170.73"/>
+      <polygon points="315.00,84.12 321.74,104.84 343.53,104.84 325.90,117.66 332.63,138.39 315.00,125.57 297.37,138.39 304.10,117.66 286.47,104.84 308.26,104.84"/>
+    </g>
+  </svg>
+  <div>
+    <p><b>Co-funded by the European Union.</b> Views and opinions expressed are however those of the
+    author(s) only and do not necessarily reflect those of the European Union or the European
+    Education and Culture Executive Agency (EACEA). Neither the European Union nor EACEA can be held
+    responsible for them.</p>
+    <p class="grant">Erasmus+ KA210-VET small-scale partnership · project number KA210-VET-778D8F70 ·
+    March 2025 – December 2026</p>
+  </div>
+</div></div></div>
+
+<footer><div class="wrap">
+  <span>RISE — an Erasmus+ partnership project</span>
+  <span><a href="https://app.riseproject.space/privacy/en">Privacy notice</a> · <a href="https://github.com/tehnickazr/RISE-Project">Source code</a> · <a href="mailto:admin@riseproject.space">Contact</a></span>
+</div></footer>
+
+</body>
+</html>

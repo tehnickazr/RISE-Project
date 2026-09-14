@@ -53,14 +53,21 @@ Create the first administrator:
 
 ## Putting it on a server
 
-One script takes a bare Debian or Ubuntu machine to a working install —
-packages, a deploy user, PostgreSQL, systemd, nginx with TLS, log rotation and
-a daily backup:
+**The whole path, step by step, is at <https://riseproject.space/setup>** —
+including the parts that are not commands: the DNS record, the keys you have to
+go and get, the first administrator, and what to do before students arrive.
+
+The short version. One script takes a bare Debian or Ubuntu machine to a working
+install — packages, a deploy user, PostgreSQL, systemd, nginx with TLS, log
+rotation and a daily backup:
 
 ```bash
 scp deploy/provision-production.sh root@your-server:/root/
 ssh root@your-server 'RISE_DOMAIN=rise.your-school.example bash /root/provision-production.sh'
 ```
+
+`RISE_DOMAIN` is not optional: the built-in default is *our* hostname, and left
+alone the script will ask a certificate authority for a name you do not own.
 
 It is re-runnable, it will not overwrite what is already there, and it ends by
 printing exactly what still needs a human: the keys it cannot invent, the first
@@ -124,6 +131,8 @@ Published at **<https://riseproject.space>** — the same files, served from
   built, how it is deployed, and where the bodies are buried
 - [Visual Design](docs/design/index.html) — the design system, which
   renders itself
+- [Setup guide](docs/setup/index.html) — a bare machine to a school's first
+  interview
 
 ## Tests
 

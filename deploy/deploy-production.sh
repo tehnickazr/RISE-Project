@@ -2,10 +2,16 @@
 set -euo pipefail
 
 APP_DIR="/opt/apps/rise/current"
-BRANCH="${1:-production}"
 SERVICE_NAME="rise"
 
 cd "$APP_DIR"
+
+# Default to whatever this checkout is already on, rather than a branch name
+# baked in here. The name differs between installations — ours is "production",
+# a school cloning the public repository gets "main" — and a wrong default does
+# not fail safely: `git checkout` succeeds against any branch that happens to
+# exist, and deploys something nobody asked for.
+BRANCH="${1:-$(git rev-parse --abbrev-ref HEAD)}"
 
 git fetch origin
 git checkout "$BRANCH"
