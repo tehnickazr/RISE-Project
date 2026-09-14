@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RISE — Architecture &amp; Infrastructure v2.1</title>
+<style>
+:root{
+  --background:#faf8ff;--surface:#ffffff;--surface-low:#f2f3ff;--surface-container:#eaedff;--surface-high:#e2e7ff;
+  --text:#131b2e;--text-muted:#424654;--outline:#c3c6d6;--outline-strong:#737785;
+  --primary:#0040a1;--primary-bright:#0056d2;--primary-soft:#dae2ff;
+  --success:#067047;--success-soft:#d8f7e8;--warning:#92400e;--warning-soft:#fff1c7;--error:#ba1a1a;--error-soft:#ffdad6;
+  --shadow:0 2px 14px rgba(19,27,46,.06);--shadow-hover:0 8px 24px rgba(19,27,46,.09);
+  --radius:8px;--radius-lg:16px;--page-max:1120px;--mono:"SF Mono",Menlo,Consolas,monospace;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;}
+html{background:var(--background);scroll-behavior:smooth;}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;
+  background:linear-gradient(180deg,rgba(218,226,255,.5) 0,rgba(250,248,255,0) 340px),var(--background);}
+a{color:var(--primary);}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px clamp(16px,4vw,48px);
+  background:rgba(255,255,255,.82);backdrop-filter:blur(10px);border-bottom:1px solid rgba(195,198,214,.6);}
+.topbar nav{display:flex;flex-wrap:wrap;gap:4px;}
+.topbar nav a{font-size:13px;font-weight:650;text-decoration:none;color:var(--text-muted);padding:6px 10px;border-radius:6px;white-space:nowrap;}
+.topbar nav a:hover{background:var(--surface-low);color:var(--primary);}
+.topbar .mark svg{width:92px;height:auto;display:block;}
+.wrap{width:min(var(--page-max),calc(100% - 48px));margin:0 auto;padding:40px 0 80px;}
+.cover{border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow);padding:44px;margin-bottom:16px;position:relative;overflow:hidden;}
+.cover::after{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(0,86,210,.10),rgba(0,86,210,0) 70%);}
+.cover svg.logo{width:190px;height:auto;margin-bottom:22px;}
+.cover h1{font-size:42px;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:0 0 10px;}
+.cover .sub{font-size:18px;color:var(--text-muted);max-width:660px;line-height:1.6;margin:0 0 24px;}
+.meta-grid{display:flex;flex-wrap:wrap;gap:10px 28px;font-size:14px;position:relative;}
+.meta-grid div{display:flex;flex-direction:column;}
+.meta-grid dt{color:var(--text-muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.meta-grid dd{margin:2px 0 0;font-weight:650;}
+section{border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow);padding:34px;margin-top:22px;scroll-margin-top:80px;}
+.eyebrow{color:var(--primary);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px;}
+section>h2{font-size:27px;font-weight:700;letter-spacing:-.01em;margin:0 0 8px;}
+section>p.lead{color:var(--text-muted);font-size:16px;line-height:1.6;max-width:780px;margin:0 0 22px;}
+h3.block{font-size:16px;font-weight:700;margin:28px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(195,198,214,.5);}
+h3.block:first-of-type{margin-top:6px;}
+.note{color:var(--text-muted);font-size:13.5px;line-height:1.6;}
+code.inline,td code,th code{font-family:var(--mono);font-size:12.5px;background:var(--surface-low);padding:1px 6px;border-radius:4px;color:#b3266b;}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.card{border:1px solid rgba(195,198,214,.6);border-radius:var(--radius-lg);background:var(--surface);padding:20px;}
+.card h3{margin:0 0 12px;font-size:16px;font-weight:700;}
+ul.clean{margin:0;padding-left:20px;}
+ul.clean li{margin:6px 0;font-size:14px;line-height:1.55;}
+.callout{border-left:4px solid var(--primary-bright);background:#eef4fb;border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--text-muted);margin-top:16px;}
+.callout.warn{border-left-color:var(--warning);background:var(--warning-soft);color:#5c3a10;}
+.callout.ok{border-left-color:var(--success);background:var(--success-soft);color:#0b4d34;}
+.callout strong{color:var(--text);}
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;margin-top:6px;border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);overflow:hidden;}
+table.t th,table.t td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(195,198,214,.4);vertical-align:top;}
+table.t th{background:var(--surface-low);color:var(--text-muted);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+table.t tr:last-child td{border-bottom:none;}
+.diagram{border:1px solid rgba(195,198,214,.6);border-radius:var(--radius-lg);background:linear-gradient(180deg,rgba(218,226,255,.28),rgba(250,248,255,0) 140px),var(--surface);padding:26px;overflow-x:auto;}
+.diagram svg{display:block;margin:0 auto;max-width:100%;height:auto;}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:12.5px;color:var(--text-muted);}
+.legend span{display:inline-flex;align-items:center;gap:7px;}
+.legend i{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.08);}
+.pill{display:inline-flex;align-items:center;min-height:26px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;}
+.p-blue{background:var(--primary-soft);color:var(--primary);}
+.p-green{background:var(--success-soft);color:var(--success);}
+.p-amber{background:var(--warning-soft);color:var(--warning);}
+.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0 0;}
+.steps li{position:relative;padding:12px 0 12px 44px;border-bottom:1px solid rgba(195,198,214,.4);font-size:14px;line-height:1.55;}
+.steps li:last-child{border-bottom:none;}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;width:28px;height:28px;border-radius:999px;background:var(--primary);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.steps li b{color:var(--text);}
+pre.code{background:#0f1c33;color:#dce6f7;border-radius:var(--radius);padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6;margin:6px 0 0;}
+pre.code .c{color:#7f93b5;}
+pre.code .k{color:#8fb3ff;}
+pre.code .s{color:#8fd0a6;}
+footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 10px;}
+@media(max-width:640px){.cover{padding:28px;}.cover h1{font-size:30px;}section{padding:22px;}.topbar nav{display:none;}}
+@media print{
+  @page{size:A4;margin:13mm 12mm;}
+  html,body{width:auto !important;background:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .topbar{display:none !important;}
+  .wrap{width:auto !important;max-width:none !important;margin:0 !important;padding:0 !important;}
+  .cover,section{box-shadow:none !important;max-width:100%;border:1px solid #b9bdcc !important;}
+  .cover::after{display:none !important;}
+  section{margin-top:14px;}
+  .diagram,.card,table.t,.callout,pre.code,.steps li{break-inside:avoid;page-break-inside:avoid;}
+  .diagram{overflow:visible;}
+  h2,h3.block{break-after:avoid;page-break-after:avoid;}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="mark">
+    <svg viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE">
+      <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+      <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+      <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+      <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+      <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+    </svg>
+  </div>
+  <nav>
+    <a href="#summary">Summary</a>
+    <a href="#overview">Overview</a>
+    <a href="#context">Context</a>
+    <a href="#stack">Stack</a>
+    <a href="#app">Application</a>
+    <a href="#lifecycle">Request flow</a>
+    <a href="#data">Data model</a>
+    <a href="#integrations">Integrations</a>
+    <a href="#auth">Auth</a>
+    <a href="#infra">Infrastructure</a>
+    <a href="#cicd">CI/CD</a>
+    <a href="#env">Environments</a>
+    <a href="#security">Security</a>
+    <a href="#ops">Operations</a>
+    <a href="#scale">Scale</a>
+    <a href="#alt">Alternatives</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <div class="cover">
+    <svg class="logo" viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE logo">
+      <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+      <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+      <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+      <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+      <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+    </svg>
+    <h1>Architecture &amp; Infrastructure</h1>
+    <p class="sub">How the RISE AI Interview Coach is built, deployed, and operated — the application layers, data model, external integrations, hosting topology, and the automated release pipeline.</p>
+    <dl class="meta-grid">
+      <div><dt>Product</dt><dd>RISE — AI Interview Coach</dd></div>
+      <div><dt>Document</dt><dd>Architecture &amp; Infrastructure</dd></div>
+      <div><dt>Version</dt><dd>2.1</dd></div>
+      <div><dt>Date</dt><dd>2026-09-14 <span style="color:var(--text-muted)">(v2.0: 2026-09-03 · v1.0: 2026-07-07)</span></dd></div>
+      <div><dt>Author</dt><dd>Zoran Krnetić (PR BRIGHTNESS)</dd></div>
+    </dl>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <section id="summary">
+    <p class="eyebrow">00 — Executive Summary</p>
+    <h2>Executive Summary</h2>
+    <p class="lead">RISE is the AI-powered interview-coaching platform delivered under the Erasmus+ project <b>KA210-VET-778D8F70</b>. It lets vocational-school students practise realistic job interviews and receive immediate, rubric-based feedback in their own language, while educators and counsellors follow each student's progress. This document describes the technical architecture and infrastructure that deliver that vision — and shows how each engineering choice maps to a stated objective of the funded proposal.</p>
+    <p class="note" style="margin-bottom:18px">The platform's guiding principle is a small, low-cost, provider-agnostic footprint that protects student data by default and can grow — from a single server, to a school's own network, to the cloud — without being rebuilt.</p>
+
+    <div class="card" style="border-left:4px solid var(--primary);margin:20px 0;">
+      <p style="margin:0 0 10px;"><b>v2.1 — 14 September 2026.</b> Four tables the document had never named, and one sentence that had become untrue:</p>
+      <ul class="clean" style="margin:0 0 16px;">
+        <li><b>The data model was four tables short</b> — <code class="inline">password_resets</code>, <code class="inline">platform_settings</code>, <code class="inline">org_settings</code> and <code class="inline">transcription_calls</code>. The last had been missing since voice input shipped.</li>
+        <li><b>An account can be suspended, and a student's interviews can be capped.</b> Both are new state on existing rows, and both are enforced on paths this document traces — so §05 now traces starting an interview as well as answering in one.</li>
+        <li><b>A school completes its own privacy notice.</b> The retention periods it sets are the ones the notice publishes, which changes what "retention is outstanding" means: the numbers are decided, the deletion job that honours them is not.</li>
+        <li><b>Mail has two transports and the choice is declared</b>, not inferred from which variables are set.</li>
+      </ul>
+      <p style="margin:0 0 10px;"><b>v2.0 — 3 September 2026.</b> Three changes since v1.0 alter the shape of the system rather than its details, and each is why a section below now reads differently:</p>
+      <ul class="clean" style="margin:0;">
+        <li><b>The platform serves three schools, separated from each other.</b> It was written for one. A teacher now reaches only students of their own school; a platform-administrator role sits above all of them and can read no student data.</li>
+        <li><b>Content is versioned, and every interview records the version it was taken against.</b> Deleting a question can no longer make a finished interview unreadable — which, before this, it did silently.</li>
+        <li><b>The model provider is Scaleway, in Paris</b>, not Together.ai. Changed in August 2026 for EU data residency: these are answers written by minors.</li>
+      </ul>
+    </div>
+    <h3 class="block">Project goals &amp; how the architecture meets them</h3>
+    <table class="t">
+      <tr><th>Goal (KA210-VET proposal)</th><th>How the architecture delivers it</th></tr>
+      <tr><td><b>AI-driven interview practice with real-time, structured feedback</b></td><td>A server-controlled interview engine calls a hosted LLM per answer and returns validated, rubric-scored JSON feedback and a session summary.</td></tr>
+      <tr><td><b>Multilingual &amp; inclusive</b> (Serbian, English, French, Portuguese)</td><td>Four-language UI and content; feedback generated in the student's language.</td></tr>
+      <tr><td><b>Accessible across devices</b> (desktop, tablet, mobile) and for SEN students</td><td>Responsive single-page app; accessibility baseline extended at launch (see §12 and the platform PRD).</td></tr>
+      <tr><td><b>Data privacy &amp; GDPR compliance</b> for minors and SEN students</td><td>Inference and hosting inside the EU; pseudonymous student accounts; every staff read of a student record recorded; a person downloads their own data themselves. Student data can stay entirely on-site via the on-prem model (§15). See §12.</td></tr>
+      <tr><td><b>Progress tracking &amp; analytics</b> for students and educators</td><td>Full interview history, scores, and per-answer feedback persisted in PostgreSQL, ready for longitudinal dashboards and KPI export.</td></tr>
+      <tr><td><b>Educator / counsellor guidance</b> tailored to each student</td><td>Role-based access (student · teacher · school administrator · platform administrator), scoped to the teacher's own school. <b>Neither administrator role can read a transcript</b>; the only readers of a student's answers are that student and teachers at their own school.</td></tr>
+      <tr><td><b>Staff-managed content</b> without developer involvement</td><td>Each school points the platform at <b>its own spreadsheet</b> and imports it when ready — no code change to add content, and editing a sheet changes nothing until it is imported.</td></tr>
+      <tr><td><b>Scalable, reliable, modular architecture</b> for future expansion</td><td>Stateless app behind a proxy, isolated module boundaries for AI, email, content, and persistence; scales horizontally and swaps providers cleanly.</td></tr>
+      <tr><td><b>Low-cost, sustainable operation</b></td><td>Runs on a single modest host; per-message model/token accounting provides the basis for cost and eco-footprint reporting.</td></tr>
+      <tr><td><b>Provider independence &amp; open, portable deployment</b></td><td>One codebase runs on a managed VPS, a school's own network with a local LLM, or AWS — configuration only, no re-architecture (§15).</td></tr>
+    </table>
+    <div class="callout"><strong>Reading this document.</strong> Sections 01–08 describe the application and its runtime; 09–14 cover hosting, delivery, security, operations, and scale; 15 presents alternative deployment models. Where a topic maps to a launch-readiness commitment, it references the platform PRD.</div>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <p class="eyebrow">01 — Introduction</p>
+    <h2>Overview &amp; Principles</h2>
+    <p class="lead">RISE is a server-rendered-agnostic web application: a React single-page app served by a single Node.js/Express process, backed by PostgreSQL, with AI feedback from a hosted large-language model and interview content managed in a spreadsheet CMS. The design favours a small, low-cost, provider-agnostic footprint that can run on one modest server and move to larger infrastructure without rework.</p>
+    <div class="two-col">
+      <div class="card">
+        <h3>Architectural principles</h3>
+        <ul class="clean">
+          <li><b>Simple by default.</b> One deployable process; no container orchestration, no message brokers, no microservices at this scale.</li>
+          <li><b>Provider-agnostic.</b> Stack runs on any Linux VPS, cloud VM, or on-prem appliance; no proprietary cloud lock-in.</li>
+          <li><b>Modular seams.</b> Content source, AI provider, email, and persistence are isolated modules, so each can be swapped independently.</li>
+          <li><b>Stateless app, stateful DB.</b> All durable state lives in PostgreSQL; the Node process holds no session state in memory.</li>
+          <li><b>Secrets outside the repo.</b> All credentials come from an environment file that is never committed.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>At a glance</h3>
+        <table class="t" style="margin-top:0">
+          <tr><th>Concern</th><th>Choice</th></tr>
+          <tr><td>Frontend</td><td>React 19 + Vite 6 SPA</td></tr>
+          <tr><td>Backend</td><td>Node.js + Express 4</td></tr>
+          <tr><td>Database</td><td>PostgreSQL</td></tr>
+          <tr><td>AI</td><td>Scaleway Generative APIs (Qwen), Paris</td></tr>
+          <tr><td>Content store</td><td>PostgreSQL (imported from Sheets)</td></tr>
+          <tr><td>Content authoring</td><td>Google Sheets → DB import</td></tr>
+          <tr><td>Email</td><td>Resend (transactional)</td></tr>
+          <tr><td>Edge</td><td>nginx reverse proxy + TLS</td></tr>
+          <tr><td>Runtime mgmt</td><td>systemd</td></tr>
+          <tr><td>Release</td><td>GitHub push-to-production (CI/CD)</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYSTEM CONTEXT -->
+  <section id="context">
+    <p class="eyebrow">02 — The big picture</p>
+    <h2>System Context</h2>
+    <p class="lead">The browser talks to a single application server through nginx. That server owns the database and, at request time, calls out to just two managed services — the LLM provider and the email provider. Interview content lives in PostgreSQL; a spreadsheet is only a human authoring surface, imported on demand and never read during a user request. <b>Each of the three schools has its own spreadsheet and its own content</b>, and one system holds all three, separated from each other.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs>
+          <marker id="arm" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0040a1"/></marker>
+          <marker id="armg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#737785"/></marker>
+        </defs>
+        <!-- users -->
+        <rect x="24" y="150" width="150" height="120" rx="12" fill="#dae2ff" stroke="#0040a1"/>
+        <text x="99" y="200" text-anchor="middle" font-size="15" font-weight="700" fill="#131b2e">Users</text>
+        <text x="99" y="222" text-anchor="middle" font-size="12" fill="#424654">Students ·</text>
+        <text x="99" y="238" text-anchor="middle" font-size="12" fill="#424654">Teachers · Admin</text>
+        <text x="99" y="256" text-anchor="middle" font-size="11" fill="#737785">Browser (SPA)</text>
+        <!-- nginx -->
+        <rect x="250" y="165" width="120" height="90" rx="12" fill="#eaedff" stroke="#0056d2"/>
+        <text x="310" y="205" text-anchor="middle" font-size="14" font-weight="700" fill="#131b2e">nginx</text>
+        <text x="310" y="224" text-anchor="middle" font-size="11" fill="#737785">TLS · proxy</text>
+        <!-- app server box -->
+        <rect x="430" y="120" width="200" height="185" rx="14" fill="#ffffff" stroke="#0040a1" stroke-width="2"/>
+        <text x="530" y="150" text-anchor="middle" font-size="15" font-weight="800" fill="#0040a1">RISE App Server</text>
+        <text x="530" y="169" text-anchor="middle" font-size="11" fill="#737785">Node.js · Express · :3002</text>
+        <rect x="452" y="185" width="156" height="44" rx="8" fill="#f2f3ff" stroke="#c3c6d6"/>
+        <text x="530" y="212" text-anchor="middle" font-size="12" fill="#131b2e">REST API + static SPA</text>
+        <rect x="452" y="238" width="156" height="44" rx="8" fill="#f2f3ff" stroke="#c3c6d6"/>
+        <text x="530" y="265" text-anchor="middle" font-size="12" fill="#131b2e">Session &amp; auth</text>
+        <!-- postgres -->
+        <rect x="700" y="40" width="170" height="80" rx="12" fill="#d8f7e8" stroke="#067047"/>
+        <text x="785" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#131b2e">PostgreSQL</text>
+        <text x="785" y="92" text-anchor="middle" font-size="11" fill="#737785">Users · sessions · feedback</text>
+        <!-- LLM -->
+        <rect x="700" y="150" width="170" height="72" rx="12" fill="#eaedff" stroke="#0056d2"/>
+        <text x="785" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#131b2e">Scaleway</text>
+        <text x="785" y="200" text-anchor="middle" font-size="11" fill="#737785">Qwen LLM</text>
+        <!-- Sheets (authoring, offline import — NOT on the request path) -->
+        <rect x="700" y="248" width="170" height="72" rx="12" fill="#fff1c7" stroke="#92400e" stroke-dasharray="5 4"/>
+        <text x="785" y="274" text-anchor="middle" font-size="13" font-weight="700" fill="#131b2e">Google Sheets</text>
+        <text x="785" y="292" text-anchor="middle" font-size="11" fill="#737785">Content authoring</text>
+        <text x="785" y="308" text-anchor="middle" font-size="10" fill="#737785">offline import only</text>
+        <!-- Email -->
+        <rect x="700" y="348" width="170" height="60" rx="12" fill="#ffffff" stroke="#737785"/>
+        <text x="785" y="374" text-anchor="middle" font-size="13" font-weight="700" fill="#131b2e">Resend</text>
+        <text x="785" y="392" text-anchor="middle" font-size="11" fill="#737785">Invitation email</text>
+        <!-- arrows -->
+        <line x1="176" y1="210" x2="246" y2="210" stroke="#0040a1" stroke-width="2" marker-end="url(#arm)"/>
+        <text x="211" y="202" text-anchor="middle" font-size="10" fill="#737785">HTTPS</text>
+        <line x1="372" y1="210" x2="426" y2="210" stroke="#0040a1" stroke-width="2" marker-end="url(#arm)"/>
+        <line x1="632" y1="180" x2="696" y2="110" stroke="#067047" stroke-width="2" marker-end="url(#armg)"/>
+        <text x="678" y="140" text-anchor="middle" font-size="10" fill="#737785">SQL</text>
+        <line x1="632" y1="200" x2="696" y2="185" stroke="#737785" stroke-width="1.6" marker-end="url(#armg)"/>
+        <line x1="696" y1="278" x2="632" y2="250" stroke="#92400e" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#armg)"/>
+        <text x="666" y="244" text-anchor="middle" font-size="10" fill="#92400e">import</text>
+        <line x1="632" y1="270" x2="696" y2="372" stroke="#737785" stroke-width="1.6" marker-end="url(#armg)"/>
+        <text x="655" y="335" text-anchor="middle" font-size="10" fill="#737785">HTTPS</text>
+      </svg>
+      <div class="legend">
+        <span><i style="background:#dae2ff;border-color:#0040a1"></i>Client</span>
+        <span><i style="background:#eaedff;border-color:#0056d2"></i>RISE / edge</span>
+        <span><i style="background:#d8f7e8;border-color:#067047"></i>Data store</span>
+        <span><i style="background:#fff1c7;border-color:#92400e"></i>Content</span>
+        <span><i style="background:#ffffff;border-color:#737785"></i>3rd-party service</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack">
+    <p class="eyebrow">03 — Technology</p>
+    <h2>Technology Stack</h2>
+    <p class="lead">Deliberately mainstream, well-supported components with no exotic dependencies — chosen so the platform is cheap to run and easy to hand over.</p>
+    <table class="t">
+      <tr><th>Layer</th><th>Technology</th><th>Role</th></tr>
+      <tr><td>Client</td><td>React 19, React Router 7, Vite 6</td><td>Single-page app; built to static assets by Vite</td></tr>
+      <tr><td>Server</td><td>Node.js, Express 4</td><td>REST API, session handling, serves the built SPA</td></tr>
+      <tr><td>Auth</td><td>express-session, connect-pg-simple, bcryptjs</td><td>Cookie sessions stored in Postgres; hashed passwords</td></tr>
+      <tr><td>Validation</td><td>Zod</td><td>Schema validation of Sheets rows and LLM JSON output</td></tr>
+      <tr><td>Database</td><td>PostgreSQL (pgcrypto)</td><td>Durable store; UUID keys; JSONB feedback</td></tr>
+      <tr><td>AI</td><td>Scaleway Generative APIs — Qwen (OpenAI-compatible), <b>Paris region</b></td><td>Rubric feedback &amp; session summaries as structured JSON. Chosen over Together.ai in August 2026 for EU data residency: student answers are written by minors and must not leave the EU</td></tr>
+      <tr><td>Content store</td><td>PostgreSQL</td><td>Scenarios, questions, rubrics served from the database</td></tr>
+      <tr><td>Content authoring</td><td>Google Sheets API (google-auth-library)</td><td>Human editing surface; imported into the DB offline</td></tr>
+      <tr><td>Email</td><td>Resend</td><td>Transactional invitation emails</td></tr>
+      <tr><td>Edge</td><td>nginx</td><td>TLS termination, reverse proxy to :3002</td></tr>
+      <tr><td>Runtime</td><td>systemd</td><td>Process supervision, restart, logging</td></tr>
+      <tr><td>OS</td><td>Linux VPS</td><td>Single host; provider-agnostic</td></tr>
+    </table>
+    <div class="callout"><strong>Dependency discipline.</strong> The backend ships seven runtime dependencies and the frontend three. A small surface area keeps the security-patch burden low and the build fast.</div>
+  </section>
+
+  <!-- APPLICATION -->
+  <section id="app">
+    <p class="eyebrow">04 — Application</p>
+    <h2>Application Architecture</h2>
+    <p class="lead">One Express process exposes a REST API under <code class="inline">/api</code> and serves the compiled React app for everything else, with an SPA fallback. Internally the backend is organised into thin routers over a set of focused service modules.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <!-- frontend -->
+        <rect x="24" y="30" width="240" height="340" rx="14" fill="#faf8ff" stroke="#0040a1"/>
+        <text x="144" y="58" text-anchor="middle" font-size="14" font-weight="800" fill="#0040a1">Frontend (SPA)</text>
+        <rect x="44" y="74" width="200" height="42" rx="8" fill="#ffffff" stroke="#c3c6d6"/><text x="144" y="100" text-anchor="middle" font-size="12" fill="#131b2e">Pages · Router</text>
+        <rect x="44" y="124" width="200" height="42" rx="8" fill="#ffffff" stroke="#c3c6d6"/><text x="144" y="150" text-anchor="middle" font-size="12" fill="#131b2e">AuthContext (session)</text>
+        <rect x="44" y="174" width="200" height="42" rx="8" fill="#ffffff" stroke="#c3c6d6"/><text x="144" y="200" text-anchor="middle" font-size="12" fill="#131b2e">api.js (fetch client)</text>
+        <rect x="44" y="224" width="200" height="42" rx="8" fill="#ffffff" stroke="#c3c6d6"/><text x="144" y="250" text-anchor="middle" font-size="12" fill="#131b2e">i18n (sr/en/fr/pt)</text>
+        <rect x="44" y="274" width="200" height="42" rx="8" fill="#ffffff" stroke="#c3c6d6"/><text x="144" y="300" text-anchor="middle" font-size="12" fill="#131b2e">Components</text>
+        <text x="144" y="352" text-anchor="middle" font-size="11" fill="#737785">Built by Vite → /frontend/dist</text>
+        <!-- api boundary -->
+        <line x1="286" y1="30" x2="286" y2="370" stroke="#c3c6d6" stroke-dasharray="5 5"/>
+        <text x="300" y="205" font-size="11" fill="#737785" transform="rotate(90 300 205)">HTTPS · JSON · cookie session</text>
+        <!-- backend -->
+        <rect x="330" y="30" width="330" height="340" rx="14" fill="#eef2ff" stroke="#0040a1"/>
+        <text x="495" y="58" text-anchor="middle" font-size="14" font-weight="800" fill="#0040a1">Backend — Express</text>
+        <text x="495" y="76" text-anchor="middle" font-size="11" fill="#737785">Routers</text>
+        <rect x="348" y="86" width="142" height="34" rx="7" fill="#dae2ff" stroke="#0056d2"/><text x="419" y="108" text-anchor="middle" font-size="11.5" fill="#131b2e">auth · admin</text>
+        <rect x="500" y="86" width="142" height="34" rx="7" fill="#dae2ff" stroke="#0056d2"/><text x="571" y="108" text-anchor="middle" font-size="11.5" fill="#131b2e">invitations</text>
+        <rect x="348" y="126" width="142" height="34" rx="7" fill="#dae2ff" stroke="#0056d2"/><text x="419" y="148" text-anchor="middle" font-size="11.5" fill="#131b2e">scenarios</text>
+        <rect x="500" y="126" width="142" height="34" rx="7" fill="#dae2ff" stroke="#0056d2"/><text x="571" y="148" text-anchor="middle" font-size="11.5" fill="#131b2e">sessions</text>
+        <text x="495" y="182" text-anchor="middle" font-size="11" fill="#737785">Service modules</text>
+        <rect x="348" y="190" width="142" height="40" rx="7" fill="#ffffff" stroke="#c3c6d6"/><text x="419" y="215" text-anchor="middle" font-size="11.5" fill="#131b2e">llm/together</text>
+        <rect x="500" y="190" width="142" height="40" rx="7" fill="#ffffff" stroke="#c3c6d6"/><text x="571" y="215" text-anchor="middle" font-size="11.5" fill="#131b2e">content/import</text>
+        <rect x="348" y="236" width="142" height="40" rx="7" fill="#ffffff" stroke="#c3c6d6"/><text x="419" y="261" text-anchor="middle" font-size="11.5" fill="#131b2e">auth/middleware</text>
+        <rect x="500" y="236" width="142" height="40" rx="7" fill="#ffffff" stroke="#c3c6d6"/><text x="571" y="261" text-anchor="middle" font-size="11.5" fill="#131b2e">email/resend</text>
+        <rect x="348" y="282" width="294" height="40" rx="7" fill="#ffffff" stroke="#c3c6d6"/><text x="495" y="307" text-anchor="middle" font-size="11.5" fill="#131b2e">db/pool · db/migrate (pg)</text>
+        <text x="495" y="352" text-anchor="middle" font-size="11" fill="#737785">Static file serving + SPA fallback</text>
+        <!-- externals -->
+        <rect x="700" y="60" width="176" height="52" rx="10" fill="#d8f7e8" stroke="#067047"/><text x="788" y="91" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">PostgreSQL</text>
+        <rect x="700" y="132" width="176" height="52" rx="10" fill="#eaedff" stroke="#0056d2"/><text x="788" y="163" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">Scaleway</text>
+        <rect x="700" y="204" width="176" height="52" rx="10" fill="#fff1c7" stroke="#92400e" stroke-dasharray="5 4"/><text x="788" y="228" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">Google Sheets</text><text x="788" y="245" text-anchor="middle" font-size="9.5" fill="#737785">offline import</text>
+        <rect x="700" y="276" width="176" height="52" rx="10" fill="#ffffff" stroke="#737785"/><text x="788" y="307" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">Resend</text>
+        <line x1="662" y1="300" x2="698" y2="90" stroke="#067047" stroke-width="1.6"/>
+        <line x1="644" y1="210" x2="698" y2="158" stroke="#0056d2" stroke-width="1.6"/>
+        <line x1="644" y1="210" x2="698" y2="230" stroke="#92400e" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <line x1="644" y1="256" x2="698" y2="300" stroke="#737785" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <div class="two-col" style="margin-top:16px">
+      <div class="card">
+        <h3>Frontend</h3>
+        <ul class="clean">
+          <li>React SPA built by Vite to static assets, served by the same Node process — no separate web server or CDN required.</li>
+          <li><code class="inline">AuthContext</code> holds the logged-in user; the API is called with credentialed <code class="inline">fetch</code> (session cookie).</li>
+          <li>Four-language UI (sr/en/fr/pt) via static translation modules.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Backend</h3>
+        <ul class="clean">
+          <li>Five routers mount under <code class="inline">/api</code>; a <code class="inline">/health</code> endpoint supports uptime checks.</li>
+          <li>Business logic lives in service modules (LLM, Sheets, email, auth, DB) — routers stay thin.</li>
+          <li>The interview state machine (next question, scoring, summary) lives server-side; the AI never drives flow.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIFECYCLE -->
+  <section id="lifecycle">
+    <p class="eyebrow">05 — Runtime</p>
+    <h2>Request Lifecycle — Submitting an Answer</h2>
+    <p class="lead">The most involved path in the system: a student submits an answer and receives structured AI feedback. In a single request it reads and writes the database and calls the LLM — content is already local, so the spreadsheet is never touched.</p>
+    <ol class="steps">
+      <li><b>Browser → nginx → app.</b> A credentialed <code class="inline">POST /api/sessions/:id/answers</code> arrives; nginx forwards it to Node on <code class="inline">127.0.0.1:3002</code> with forwarding headers.</li>
+      <li><b>Authenticate, authorize, and place.</b> The session cookie is resolved against the Postgres session store. The caller's organisation is then read <i>from the database</i>, not from the cookie — which is also where a suspended school is refused — and the route confirms the caller owns the in-progress session.</li>
+      <li><b>Load scenario, at the session's own version.</b> The scenario, questions and rubric are read from PostgreSQL at the <b>content version this interview was started on</b> — not at whatever is current. A question edited or deleted since the student began cannot change or vanish from an interview in progress.</li>
+      <li><b>Persist the answer.</b> The student's answer is written to <code class="inline">interview_messages</code>.</li>
+      <li><b>Call the LLM.</b> A rubric-grounded prompt goes to Scaleway in JSON mode, under a per-call timeout; the response is validated against a Zod schema, with one repair retry on failure.</li>
+      <li><b>Persist feedback.</b> Validated feedback is stored in <code class="inline">answer_feedback</code> (JSONB + overall score) and an AI message row records model + token usage.</li>
+      <li><b>Advance the state machine.</b> The server computes the next unanswered question; if none remain it generates a session summary and marks the session <span class="pill p-green">completed</span>.</li>
+      <li><b>Respond.</b> The feedback and next question (or summary) return as JSON; the SPA renders the feedback block. What crosses to a student is filtered by role: <b>expected answers and rubric weights never do</b> — they are the answer key and the mark — while rubric <i>labels</i> do, so the competency is named in the student's own language rather than as a prettified database key.</li>
+    </ol>
+
+    <h3>And the shorter one — starting an interview</h3>
+    <p>Worth tracing separately because it is the only path that can refuse, and because <b>what it refuses on is counted at exactly one moment.</b></p>
+    <ol class="steps">
+      <li><b>Authenticate and place</b>, as above. Only a student may start one.</li>
+      <li><b>Resolve the scenario</b> against the school's current content version, and refuse a retired one — past interviews still open on retired content, but no new one begins on it.</li>
+      <li><b>Check the allowance.</b> Three limits in order of how final they are: the student's total, then their attempts at this scenario, then the per-scenario waiting period since their last attempt at it. The first two are counted from sessions <em>started</em>, finished or not; the third is measured from the previous attempt's start, because <code class="inline">completed_at</code> is null on an abandoned session and a cooldown anchored there would never begin for somebody who opens an interview and walks away.</li>
+      <li><b>Insert and respond</b> with the first question.</li>
+    </ol>
+    <div class="callout"><strong>Nothing on this path can strand a half-finished interview.</strong> The limits are consulted when a session is created and nowhere else: resuming and answering never look at them, so a student who opened three interviews and abandoned all three may come back weeks later and finish every one. A cap that could strand an interview would punish exactly the student who came back to it.
+    <br><br>The check reads and the insert writes with no lock between them, so two simultaneous starts can both pass and take a student one over. Left as it is deliberately — serialising every start in the platform to remove, at worst, one extra interview for one student is the wrong trade. The limit is a guard rail against a runaway bill, not a ledger.</div>
+
+    <div class="callout warn"><strong>Latency note.</strong> The only external call on this path is the LLM request, which runs synchronously inside the HTTP request and is its dominant cost. Everything else — scenario content, session state, feedback — is a local database read/write. This is a candidate for asynchronous handling as load grows (see <a href="#scale">Scalability</a>).</div>
+  </section>
+
+  <!-- DATA MODEL -->
+  <section id="data">
+    <p class="eyebrow">06 — Data</p>
+    <h2>Data Model</h2>
+    <p class="lead">Four core interview tables (below), a set of imported content tables, and a session store — all in PostgreSQL. UUID primary keys (<code class="inline">pgcrypto</code>), foreign keys with cascade delete, CHECK constraints for enumerations, and JSONB for AI feedback. Schema is versioned by an in-repo migration runner.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 880 380" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs><marker id="fk" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#0040a1"/></marker></defs>
+        <!-- users -->
+        <rect x="30" y="130" width="190" height="120" rx="10" fill="#dae2ff" stroke="#0040a1"/>
+        <text x="125" y="154" text-anchor="middle" font-size="14" font-weight="800" fill="#0040a1">users</text>
+        <text x="46" y="176" font-size="11.5" fill="#131b2e">id (uuid PK)</text>
+        <text x="46" y="194" font-size="11.5" fill="#424654">email · password_hash</text>
+        <text x="46" y="212" font-size="11.5" fill="#424654">role · display_name</text>
+        <text x="46" y="230" font-size="11.5" fill="#424654">preferred_language</text>
+        <!-- sessions -->
+        <rect x="330" y="120" width="210" height="140" rx="10" fill="#eaedff" stroke="#0056d2"/>
+        <text x="435" y="144" text-anchor="middle" font-size="14" font-weight="800" fill="#0040a1">interview_sessions</text>
+        <text x="346" y="166" font-size="11.5" fill="#131b2e">id (uuid PK)</text>
+        <text x="346" y="184" font-size="11.5" fill="#424654">student_id → users</text>
+        <text x="346" y="202" font-size="11.5" fill="#424654">scenario_id · language</text>
+        <text x="346" y="220" font-size="11.5" fill="#424654">status · attempt_number</text>
+        <text x="346" y="238" font-size="11.5" fill="#424654">started_at · completed_at</text>
+        <!-- messages -->
+        <rect x="640" y="20" width="215" height="150" rx="10" fill="#ffffff" stroke="#737785"/>
+        <text x="747" y="44" text-anchor="middle" font-size="13.5" font-weight="800" fill="#0040a1">interview_messages</text>
+        <text x="656" y="66" font-size="11.5" fill="#131b2e">id (uuid PK)</text>
+        <text x="656" y="84" font-size="11.5" fill="#424654">session_id → sessions</text>
+        <text x="656" y="102" font-size="11.5" fill="#424654">sender · message_type</text>
+        <text x="656" y="120" font-size="11.5" fill="#424654">content · question_id</text>
+        <text x="656" y="138" font-size="11.5" fill="#424654">llm_model · *_tokens</text>
+        <!-- feedback -->
+        <rect x="640" y="210" width="215" height="150" rx="10" fill="#d8f7e8" stroke="#067047"/>
+        <text x="747" y="234" text-anchor="middle" font-size="13.5" font-weight="800" fill="#0040a1">answer_feedback</text>
+        <text x="656" y="256" font-size="11.5" fill="#131b2e">id (uuid PK)</text>
+        <text x="656" y="274" font-size="11.5" fill="#424654">session_id → sessions</text>
+        <text x="656" y="292" font-size="11.5" fill="#424654">answer_message_id → msg</text>
+        <text x="656" y="310" font-size="11.5" fill="#424654">student_answer</text>
+        <text x="656" y="328" font-size="11.5" fill="#424654">ai_feedback_json (jsonb)</text>
+        <text x="656" y="346" font-size="11.5" fill="#424654">overall_score</text>
+        <!-- relations -->
+        <line x1="220" y1="190" x2="326" y2="190" stroke="#0040a1" stroke-width="1.8" marker-end="url(#fk)"/>
+        <line x1="540" y1="160" x2="636" y2="100" stroke="#0040a1" stroke-width="1.8" marker-end="url(#fk)"/>
+        <line x1="540" y1="210" x2="636" y2="270" stroke="#0040a1" stroke-width="1.8" marker-end="url(#fk)"/>
+        <line x1="747" y1="170" x2="747" y2="206" stroke="#737785" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#fk)"/>
+      </svg>
+      <div class="legend">
+        <span><i style="background:#dae2ff;border-color:#0040a1"></i>Identity</span>
+        <span><i style="background:#eaedff;border-color:#0056d2"></i>Session state</span>
+        <span><i style="background:#ffffff;border-color:#737785"></i>Transcript</span>
+        <span><i style="background:#d8f7e8;border-color:#067047"></i>Scored feedback</span>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:16px">
+      <div class="card">
+        <h3>Tenancy</h3>
+        <ul class="clean">
+          <li><code class="inline">organizations</code> — slug, name, country, default language, and a status that blocks sign-in when suspended.</li>
+          <li><code class="inline">users.org_id</code> — required for every role except <code class="inline">super_admin</code>, which must have none. Both directions are a CHECK constraint, not a convention.</li>
+          <li><code class="inline">user_invitations.org_id</code> — an invitation carries the organisation it was issued for, so accepting a link cannot place someone in a school nobody chose.</li>
+          <li><code class="inline">groups</code>, <code class="inline">group_teachers</code>, <code class="inline">group_students</code> — classes within a school. <b>Built and deliberately empty.</b> Scoping is additive: a teacher with no group assignment sees their whole school, so an empty table behaves exactly as if groups were switched off.</li>
+          <li><code class="inline">org_settings</code> — one row per school, created lazily: the paragraphs of the privacy notice only a school can supply (controller identity, data protection officer, lawful basis, retention periods, supervisory authority) and the support contact its students are shown. Kept off <code class="inline">organizations</code> deliberately — that row is read on <em>every</em> request through <code class="inline">loadActor</code>, and a data protection officer's telephone number has no business being carried through all of them to serve a page opened twice a year.</li>
+          <li><code class="inline">platform_settings</code> — a single row, enforced by a boolean primary key with a CHECK, holding what every school inherits: the interview limits and the platform's own support address. A school overrides a limit by setting its own; <code class="inline">NULL</code> means "whatever the platform says".</li>
+          <li><code class="inline">users.status</code> — <span class="pill p-blue">active</span> or <span class="pill p-blue">suspended</span>. Two values and not three: to the person holding the account, it is either usable or it is not.</li>
+        </ul>
+
+        <h3>Content</h3>
+        <ul class="clean">
+          <li><code class="inline">org_content_source</code> — which spreadsheet a school imports from, and the result of the last connection test. <b>No credentials are stored</b>: access is granted by sharing the sheet with the platform's service account.</li>
+          <li><code class="inline">content_versions</code> — one row per import, at most one current per school.</li>
+          <li><code class="inline">content_scenarios</code>, <code class="inline">content_questions</code>, <code class="inline">content_rubrics</code> — keyed by version. An import never overwrites; it adds a version and makes it current, so reverting a bad import is a flag, not a reconstruction.</li>
+          <li><code class="inline">interview_sessions.content_version_id</code> — the pin, <code class="inline">ON DELETE RESTRICT</code>.</li>
+        </ul>
+
+        <h3>Accountability &amp; rights</h3>
+        <ul class="clean">
+          <li><code class="inline">audit_log</code> — every staff read of a student's record: actor, action, subject, time. It holds <b>no content</b>, and <b>survives the deletion of the account it describes</b>, so an erasure cannot quietly erase the evidence that the data was read. Its CHECK-constrained <code class="inline">action</code> now also admits <code class="inline">suspend</code> and <code class="inline">reactivate</code>: suspension is done <em>to</em> a data subject and nothing else would record who did it. Reactivation is logged for the same reason — an account suspended and quietly restored is the shape of a mistake.</li>
+          <li><code class="inline">data_requests</code> — erasure requests as rows with a stored due date, because Article 12(3) starts a one-month clock and an inbox has neither a due date nor evidence.</li>
+          <li><code class="inline">answer_criterion_scores</code> — per-competency scores as rows rather than inside the JSON, so reporting is a query and the numbers survive encryption of the prose.</li>
+          <li><code class="inline">answer_feedback.answer_char_count</code> — kept outside the text it measures, for the same reason.</li>
+        </ul>
+
+        <h3>Supporting</h3>
+        <ul class="clean">
+          <li><code class="inline">session</code> — the <code class="inline">connect-pg-simple</code> cookie-session store, auto-created. Note it stores <code class="inline">sess</code> as <code class="inline">json</code>, not <code class="inline">jsonb</code>, which is why ending somebody's open sessions matches on <code class="inline">sess -&gt;&gt; 'userId'</code> and never <code class="inline">-&gt;</code>: there is no equality operator against <code class="inline">jsonb</code>.</li>
+          <li><code class="inline">password_resets</code> — single-use, one-hour tokens, stored as a hash. The only self-service recovery route in the platform, and therefore the reason an account on an address that receives no mail cannot recover itself.</li>
+          <li><code class="inline">transcription_calls</code> — one row per dictation sent to Whisper: model, audio seconds, and the cost, CO₂ and water estimates that go with it. <b>No audio and no transcript.</b> The recording is held in memory for one upstream call and dropped, so there is no recording of a minor's voice anywhere in this system — which is what makes the privacy notice for that feature short.</li>
+          <li>Per-message <code class="inline">llm_model</code>, token, cost, CO₂ and water columns — the foundation for cost &amp; sustainability reporting. Costs are <b>estimates from the retail catalogue, never billed amounts</b>, and carry the rate-table version that produced them.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Integrity &amp; performance</h3>
+        <ul class="clean">
+          <li>Enumerations enforced by CHECK constraints (role, status, language, sender, message_type).</li>
+          <li>Cascade deletes keep sessions, messages, and feedback consistent when a user is removed.</li>
+          <li>Composite indexes on <code class="inline">(student_id, started_at)</code> and <code class="inline">(session_id, created_at)</code> for the common list/replay reads, and <code class="inline">(student_id, scenario_id)</code> for the interview-limit check that runs on every attempt to start one.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Migrations.</strong> A lightweight in-repo runner applies ordered SQL files (<code class="inline">0001…0006</code>) idempotently at deploy time — no external migration tool. Roles grew from student/teacher to include <span class="pill p-blue">admin</span>, and languages from sr/en to add fr/pt, each as its own migration.</div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <section id="integrations">
+    <p class="eyebrow">07 — External services</p>
+    <h2>External Integrations</h2>
+    <p class="lead">Two managed services are called at request time — the LLM and email — each behind its own module so it can be swapped or mocked independently. A third integration, Google Sheets, is used only offline to author content and import it into the database; it is never on the user request path. All calls are outbound HTTPS authenticated with secrets from the environment file.</p>
+    <div class="two-col">
+      <div class="card">
+        <h3>Scaleway — LLM</h3>
+        <ul class="clean">
+          <li>Qwen instruct model via the OpenAI-compatible chat API, in JSON-object mode.</li>
+          <li>Output validated against Zod schemas (feedback &amp; summary); one <b>repair retry</b> with the specific validation errors on failure.</li>
+          <li>Low temperature for reproducible scoring; model + token usage recorded per call.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Google Sheets — Authoring &amp; import</h3>
+        <ul class="clean">
+          <li>A spreadsheet is the human-friendly surface where school staff write scenarios, questions, and rubrics.</li>
+          <li>An <b>admin-triggered import</b> reads the sheet (service-account JWT via <code class="inline">google-auth-library</code>), validates rows with Zod, and upserts them into PostgreSQL.</li>
+          <li>After import the app serves all content from the database — the Sheets API is <b>never called during a student or teacher request</b>, so a Sheets outage cannot affect live sessions.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Email — Resend or SMTP</h3>
+        <ul class="clean">
+          <li>Sends transactional invitation and password-reset mail with a hashed, single-use token link.</li>
+          <li><b>Two transports, and <code class="inline">MAIL_TRANSPORT</code> chooses.</b> A host may legitimately carry the configuration for both, so the choice is declared rather than inferred from which variables happen to be set — inference is how a host ends up sending through the transport nobody meant to use, with two plausible explanations and only one of them looked at.</li>
+          <li>Production is deliberately on Resend until the project owns a mailbox that can receive; the SMTP path is configured and unused.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Resilience posture</h3>
+        <ul class="clean">
+          <li>The live request path depends on only the database and the LLM; content is local, so a Sheets outage cannot affect sessions.</li>
+          <li>LLM failures surface as clean API errors, not crashes; a timeout and bounded retry prevent a slow upstream from hanging a request.</li>
+          <li>Import failures are isolated to the admin import action and never reach end users.</li>
+          <li>Secrets for all integrations are injected via the environment file, never in code.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTH -->
+  <section id="auth">
+    <p class="eyebrow">08 — Security</p>
+    <h2>Authentication &amp; Sessions</h2>
+    <p class="lead">Classic, robust server-side sessions — not JWTs in local storage. The session identifier lives in a hardened cookie; all session state is in PostgreSQL.</p>
+    <table class="t">
+      <tr><th>Property</th><th>Value</th><th>Why</th></tr>
+      <tr><td>Mechanism</td><td>express-session + connect-pg-simple</td><td>Server-side sessions persisted in Postgres; survive restarts</td></tr>
+      <tr><td>Cookie name</td><td><code>rise.sid</code></td><td>Opaque session id only — no user data in the cookie</td></tr>
+      <tr><td>Flags</td><td><code>httpOnly</code>, <code>sameSite=lax</code>, <code>secure</code> (prod)</td><td>Not readable by JS; CSRF-resistant; HTTPS-only in production</td></tr>
+      <tr><td>Lifetime</td><td>7 days</td><td>Balances convenience against stale sessions</td></tr>
+      <tr><td>Passwords</td><td>bcryptjs hashes</td><td>Salted, slow hashing; plaintext never stored</td></tr>
+      <tr><td>Proxy trust</td><td><code>trust proxy = 1</code> (prod)</td><td>Correct protocol/secure-cookie behaviour behind nginx</td></tr>
+      <tr><td>Roles</td><td>student · teacher · admin · <b>super_admin</b></td><td>Route-level authorization, ownership checks on sessions, and an organisation predicate on every query that reaches a student record</td></tr>
+      <tr><td>Tenancy</td><td><code class="inline">org_id</code> from the database, never the request</td><td>Read fresh on each request rather than trusted from the cookie, so suspending a school takes effect at once and a client-supplied organisation identifier — the classic tenancy bypass — is never consulted</td></tr>
+      <tr><td>Account status</td><td><code class="inline">users.status</code>, re-read on every request</td><td>Suspension must take effect now, not when a cookie happens to expire. See the three-point enforcement below</td></tr>
+      <tr><td>Recovery</td><td>Single-use token, one hour, stored hashed</td><td>Self-service password reset. The response never differs between a known and an unknown address, so the form cannot be used to ask which children are registered</td></tr>
+    </table>
+
+    <div class="callout"><strong>Suspension is enforced in three places, and each alone would leave a gap.</strong>
+      Sign-in refuses a non-active account <em>after</em> the password check, with the same sentence a member of a suspended school gets — so the endpoint cannot be asked which of the two applies.
+      <code class="inline">withActor</code> re-reads the status from the database on every request that matters, because a session store is a cache and a permission check that trusts a cache is not a permission check.
+      And suspending deletes the account's open sessions, so the person stops where they are rather than continuing until their cookie lapses.
+      Sign-in alone would leave live cookies working; session deletion alone would trust the cache.</div>
+    <div class="callout ok"><strong>Registration is invitation-based.</strong> Accounts are created from hashed, single-use invitation tokens — there is no open self-registration during the pilot, which keeps the user set controlled and auditable. An accepted invitation is then <b>redacted</b> of its name and email: the identity lives on the user row, and a second copy sitting behind an otherwise pseudonymous account is the one place a real identity would survive. The row itself stays, so a reused link still answers &ldquo;already accepted&rdquo; rather than &ldquo;not found&rdquo;.</div>
+
+    <h3 class="block">Who can read a student's answers</h3>
+    <p>The shortest true statement of the access model, and the one the impact assessment rests on: <b>that student, and teachers at that student's own school.</b> Nobody else.</p>
+    <p>A school administrator manages accounts and carries out erasures — the deletion dialogue counts what it destroys and shows none of it — and a platform administrator manages organisations. Neither can open a transcript or export one, and <b>no endpoint exists that would return either</b>. That is what makes the claim durable rather than a matter of interface design: it holds exactly as long as no such endpoint is added.</p>
+    <div class="callout"><strong>Application-level enforcement, for now.</strong> The organisation predicate lives in one module rather than being repeated in each route, because the characteristic failure of shared-schema tenancy is the query that forgot its <code class="inline">WHERE</code> — and here what leaks is interview transcripts written by minors. Row-level security is the intended backstop and is <b>not yet in place</b>; it needs a transaction or a dedicated client per request, and was deliberately separated from the scoping change so that a regression in either would be attributable. See §14.</div>
+  </section>
+
+  <!-- INFRASTRUCTURE -->
+  <section id="infra">
+    <p class="eyebrow">09 — Hosting</p>
+    <h2>Infrastructure &amp; Deployment Topology</h2>
+    <p class="lead">Everything runs on a single Linux host: nginx at the edge, one Node process under systemd, and PostgreSQL on the same machine over the loopback interface. No containers, no orchestration.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs><marker id="ai" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0040a1"/></marker></defs>
+        <!-- internet -->
+        <rect x="30" y="170" width="130" height="60" rx="10" fill="#dae2ff" stroke="#0040a1"/>
+        <text x="95" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#131b2e">Internet</text>
+        <text x="95" y="214" text-anchor="middle" font-size="11" fill="#737785">HTTPS :443</text>
+        <!-- host boundary -->
+        <rect x="200" y="30" width="530" height="350" rx="16" fill="#faf8ff" stroke="#0040a1" stroke-width="2" stroke-dasharray="6 5"/>
+        <text x="220" y="56" font-size="13" font-weight="800" fill="#0040a1">Linux VPS — single host</text>
+        <!-- nginx -->
+        <rect x="230" y="80" width="180" height="80" rx="10" fill="#eaedff" stroke="#0056d2"/>
+        <text x="320" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#131b2e">nginx</text>
+        <text x="320" y="131" text-anchor="middle" font-size="11" fill="#737785">TLS · proxy_pass</text>
+        <text x="320" y="147" text-anchor="middle" font-size="10.5" fill="#737785">client_max_body_size 10m</text>
+        <!-- systemd/node -->
+        <rect x="230" y="190" width="290" height="150" rx="10" fill="#ffffff" stroke="#0040a1"/>
+        <text x="375" y="214" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0040a1">systemd: rise.service</text>
+        <text x="375" y="232" text-anchor="middle" font-size="10.5" fill="#737785">User=deploy · Restart=always</text>
+        <rect x="252" y="244" width="246" height="46" rx="8" fill="#dae2ff" stroke="#0056d2"/>
+        <text x="375" y="264" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">Node.js — RISE app</text>
+        <text x="375" y="280" text-anchor="middle" font-size="10.5" fill="#424654">127.0.0.1:3002 · serves API + SPA</text>
+        <rect x="252" y="298" width="246" height="30" rx="7" fill="#f2f3ff" stroke="#c3c6d6"/>
+        <text x="375" y="318" text-anchor="middle" font-size="10.5" fill="#424654">EnvironmentFile → shared/.env</text>
+        <!-- postgres -->
+        <rect x="560" y="200" width="150" height="90" rx="10" fill="#d8f7e8" stroke="#067047"/>
+        <text x="635" y="232" text-anchor="middle" font-size="12.5" font-weight="700" fill="#131b2e">PostgreSQL</text>
+        <text x="635" y="251" text-anchor="middle" font-size="10.5" fill="#737785">localhost:5432</text>
+        <text x="635" y="268" text-anchor="middle" font-size="10.5" fill="#737785">rise database</text>
+        <!-- logs -->
+        <rect x="560" y="80" width="150" height="60" rx="10" fill="#fff1c7" stroke="#92400e"/>
+        <text x="635" y="106" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">Logs</text>
+        <text x="635" y="124" text-anchor="middle" font-size="10" fill="#737785">/var/log/rise/app.log</text>
+        <!-- arrows -->
+        <line x1="162" y1="200" x2="226" y2="120" stroke="#0040a1" stroke-width="2" marker-end="url(#ai)"/>
+        <line x1="320" y1="162" x2="360" y2="240" stroke="#0040a1" stroke-width="2" marker-end="url(#ai)"/>
+        <text x="360" y="195" font-size="10" fill="#737785">loopback :3002</text>
+        <line x1="520" y1="268" x2="556" y2="250" stroke="#067047" stroke-width="2" marker-end="url(#ai)"/>
+        <line x1="500" y1="230" x2="556" y2="120" stroke="#92400e" stroke-width="1.4" stroke-dasharray="4 4"/>
+        <!-- to external -->
+        <rect x="770" y="150" width="90" height="120" rx="10" fill="#ffffff" stroke="#737785"/>
+        <text x="815" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#131b2e">Managed</text>
+        <text x="815" y="218" text-anchor="middle" font-size="10.5" fill="#737785">services</text>
+        <text x="815" y="236" text-anchor="middle" font-size="9.5" fill="#737785">LLM·Sheets·Email</text>
+        <line x1="520" y1="260" x2="766" y2="210" stroke="#737785" stroke-width="1.4" stroke-dasharray="4 4"/>
+      </svg>
+      <div class="legend">
+        <span><i style="background:#eaedff;border-color:#0056d2"></i>Edge</span>
+        <span><i style="background:#dae2ff;border-color:#0056d2"></i>App</span>
+        <span><i style="background:#d8f7e8;border-color:#067047"></i>Database</span>
+        <span><i style="background:#fff1c7;border-color:#92400e"></i>Logs</span>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:16px">
+      <div class="card">
+        <h3>Filesystem layout</h3>
+        <ul class="clean">
+          <li><code class="inline">/opt/apps/rise/current</code> — the deployed Git checkout (working tree).</li>
+          <li><code class="inline">/opt/apps/rise/shared/.env</code> — secrets &amp; config, outside the repo.</li>
+          <li><code class="inline">frontend/dist</code> — the built SPA served by Node.</li>
+          <li><code class="inline">/var/log/rise/app.log</code> — combined stdout/stderr.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Process supervision (systemd)</h3>
+        <ul class="clean">
+          <li>Runs as the unprivileged <code class="inline">deploy</code> user; <code class="inline">Restart=always</code> with a 5s backoff.</li>
+          <li>Graceful shutdown on <code class="inline">SIGINT</code> with a 20s stop timeout.</li>
+          <li>Config injected via <code class="inline">EnvironmentFile</code> — the same file the deploy script sources for migrations.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Co-tenancy.</strong> RISE is designed to sit alongside other apps on a shared host without interfering: it binds only to loopback <code class="inline">:3002</code>, owns a single database, and is fronted by its own nginx server block.</div>
+  </section>
+
+  <!-- CI/CD -->
+  <section id="cicd">
+    <p class="eyebrow">10 — Delivery</p>
+    <h2>Continuous Deployment</h2>
+    <p class="lead">Deployment is driven by GitHub. Merging to the <code class="inline">production</code> branch through a reviewed pull request triggers a GitHub Actions workflow that builds, tests, and then releases to the server — a conventional, auditable push-to-deploy pipeline. Builds and tests run on GitHub's runners, not blind on the production host.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 880 240" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs><marker id="ci" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0040a1"/></marker></defs>
+        <!-- row 1: source + CI -->
+        <rect x="30" y="30" width="190" height="64" rx="10" fill="#dae2ff" stroke="#0040a1"/><text x="125" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#131b2e">Merge → production</text><text x="125" y="77" text-anchor="middle" font-size="10.5" fill="#737785">reviewed PR on GitHub</text>
+        <rect x="270" y="30" width="360" height="64" rx="10" fill="#eaedff" stroke="#0056d2"/><text x="450" y="56" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0040a1">GitHub Actions — CI</text><text x="450" y="76" text-anchor="middle" font-size="10.5" fill="#737785">install · lint / test · vite build (on GitHub runners)</text>
+        <!-- row 2: deploy job -->
+        <rect x="30" y="150" width="160" height="64" rx="10" fill="#eaedff" stroke="#0056d2"/><text x="110" y="178" text-anchor="middle" font-size="11.5" font-weight="700" fill="#131b2e">Deploy to host</text><text x="110" y="196" text-anchor="middle" font-size="10.5" fill="#737785">SSH / artifact</text>
+        <rect x="220" y="150" width="140" height="64" rx="10" fill="#ffffff" stroke="#c3c6d6"/><text x="290" y="187" text-anchor="middle" font-size="11.5" fill="#131b2e">run migrations</text>
+        <rect x="390" y="150" width="180" height="64" rx="10" fill="#ffffff" stroke="#c3c6d6"/><text x="480" y="178" text-anchor="middle" font-size="11.5" fill="#131b2e">systemctl restart</text><text x="480" y="196" text-anchor="middle" font-size="10" fill="#737785">rise.service</text>
+        <rect x="600" y="150" width="180" height="64" rx="10" fill="#d8f7e8" stroke="#067047"/><text x="690" y="178" text-anchor="middle" font-size="11.5" font-weight="700" fill="#131b2e">health check</text><text x="690" y="196" text-anchor="middle" font-size="10" fill="#737785">/health · rollback on fail</text>
+        <!-- arrows -->
+        <line x1="220" y1="62" x2="266" y2="62" stroke="#0040a1" stroke-width="1.8" marker-end="url(#ci)"/>
+        <path d="M330,94 C330,130 160,120 130,146" fill="none" stroke="#0040a1" stroke-width="1.8" marker-end="url(#ci)"/>
+        <text x="250" y="128" font-size="10" fill="#737785">on green build →</text>
+        <line x1="190" y1="182" x2="216" y2="182" stroke="#0040a1" stroke-width="1.8" marker-end="url(#ci)"/>
+        <line x1="360" y1="182" x2="386" y2="182" stroke="#0040a1" stroke-width="1.8" marker-end="url(#ci)"/>
+        <line x1="570" y1="182" x2="596" y2="182" stroke="#067047" stroke-width="1.8" marker-end="url(#ci)"/>
+      </svg>
+    </div>
+    <ol class="steps" style="margin-top:14px">
+      <li><b>Merge to production.</b> Changes land on the <code class="inline">production</code> branch via a reviewed pull request — the single trigger for a release, with approvals and full history recorded on GitHub.</li>
+      <li><b>CI build &amp; test.</b> GitHub Actions checks out the code, installs dependencies, runs linting/tests, and builds the frontend — entirely on GitHub's runners, keeping build load and secrets off the production host.</li>
+      <li><b>Deploy to host.</b> Only on a green build does the workflow connect to the server over SSH and deliver the release (or a pre-built artifact).</li>
+      <li><b>Migrate.</b> Idempotent database migrations run as part of the deploy step, before the new process takes traffic.</li>
+      <li><b>Release &amp; verify.</b> The workflow restarts <code class="inline">rise.service</code> and probes <code class="inline">/health</code>; a failed check fails the deployment so a bad release is caught immediately. systemd keeps the process up with <code class="inline">Restart=always</code> as a safety net.</li>
+    </ol>
+    <div class="callout ok"><strong>Why GitHub-driven.</strong> A push-to-production pipeline keeps every release reviewable and auditable, runs builds and tests off the production host, and gives a natural home for a staging gate, manual approval, and automated health-check rollback — the standard controls expected of a launch-grade deployment.</div>
+  </section>
+
+  <!-- ENVIRONMENTS -->
+  <section id="env">
+    <p class="eyebrow">11 — Environments</p>
+    <h2>Environments</h2>
+    <p class="lead">Three environments across the engagement, sharing one codebase and configured entirely through environment variables.</p>
+    <table class="t">
+      <tr><th>Environment</th><th>Where</th><th>Purpose</th></tr>
+      <tr><td><span class="pill p-blue">Local</span></td><td>Developer machine</td><td>Vite dev server + Node with live reload; local Postgres</td></tr>
+      <tr><td><span class="pill p-amber">Staging / Pilot</span></td><td>Vendor-owned server (funded by Zoran Krnetić)</td><td>Real students run pilot sessions against the Month-1 build</td></tr>
+      <tr><td><span class="pill p-green">Production</span></td><td>Infrastructure provided by Marabunta</td><td>Launch environment for real operation (Month 3)</td></tr>
+    </table>
+    <div class="callout"><strong>Production infrastructure ownership.</strong> Per the project specification (KA210-VET-778D8F70, Activity 5), the production hosting environment is provided by Marabunta. The vendor deploys and stabilises RISE onto that infrastructure; providing the infrastructure itself is outside the vendor's scope.</div>
+  </section>
+
+  <!-- SECURITY -->
+  <section id="security">
+    <p class="eyebrow">12 — Security</p>
+    <h2>Security Posture</h2>
+    <p class="lead">The baseline below is in place today. The launch-preparation phase extends it with GDPR-grade controls (see the platform PRD, §7.1) — encryption at rest for student-authored content, an audit log of record access, data-subject-rights endpoints, and retention automation.</p>
+    <div class="two-col">
+      <div class="card">
+        <h3>In place today</h3>
+        <ul class="clean">
+          <li>TLS termination at nginx; app binds to loopback only.</li>
+          <li>bcrypt-hashed passwords; opaque, httpOnly, secure, SameSite cookies.</li>
+          <li>Server-side authorization with per-resource ownership checks.</li>
+          <li>Invitation-only registration via hashed single-use tokens.</li>
+          <li>Secrets in an environment file outside the repository; service-account keys git-ignored.</li>
+          <li>Parameterised SQL throughout (no string-built queries).</li>
+          <li>Request body size capped at the proxy (10 MB).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Added since — built</h3>
+        <ul class="clean">
+          <li><b>Audit log</b> of every teacher read of a student record, holding no content and surviving the deletion of the account it describes.</li>
+          <li><b><code class="inline">GET /api/me/export</code></b> — a person downloads their own data immediately. No administrator can export anyone else's; that endpoint was removed.</li>
+          <li><b>Erasure requests as a queue</b> with a stored due date, and a guarded delete that counts what it destroys without showing any of it.</li>
+          <li><b>Privacy notices in the product</b>, versioned in git, separate texts for students and staff.</li>
+          <li><b>Organisation isolation</b> — a teacher reaches only their own school's students.</li>
+          <li><b>A DPIA</b> (<code class="inline">DPIA.md</code>) and a transfer pack drafted for the three schools' advisers.</li>
+          <li><b>Database access logging</b>, so a maintenance session at the <code class="inline">psql</code> level is evidenced too — the application log cannot see it.</li>
+          <li><b>Account suspension</b> — reversible, destroys nothing, enforced at sign-in and on every request, and audited in both directions.</li>
+          <li><b>Self-service password reset</b> — single-use hourly tokens, and a response that does not differ between a known and an unknown address.</li>
+          <li><b>A teacher's invitation cannot carry a role.</b> Enforced by the <em>shape</em> of the schema rather than by validating a value: the field is simply absent, and because <code class="inline">z.object</code> strips what it does not declare, a body carrying <code class="inline">"role": "admin"</code> arrives at the handler without it. A test fails if the field is ever added — validating it would let a teacher mint an administrator of their own school with nothing on screen looking different.</li>
+          <li><b>Per-student interview limits</b> — attempts per scenario, a total, and a per-scenario waiting period, each a platform default a school may override. A cost ceiling as much as a pedagogical one: every answer is two model calls.</li>
+          <li><b>The privacy notice is completed by the school</b> rather than shipping with <code class="inline">&lt;placeholder&gt;</code> text visible to students — see the data model note on <code class="inline">org_settings</code>.</li>
+        </ul>
+
+        <h3>Still outstanding</h3>
+        <ul class="clean">
+          <li><b>Encryption at rest</b> for <code class="inline">student_answer</code> and feedback prose. Unblocked — the scores and answer length were moved out of the JSON so they survive it — and scheduled after the infrastructure migration, so a key that must never be lost is not introduced during a database move.</li>
+          <li><b>Retention.</b> The periods are no longer outstanding: each school now sets them itself, on the privacy notice page, and the notice states them in its own language. What is still outstanding is the <b>deletion job that reads them</b> — <b>nothing expires today</b>, and a period on that page is a published promise the platform does not yet keep on its own.</li>
+          <li><b>Scheduled backups.</b> Designed, not built. Dumps are taken by hand before releases and at no other time — the most urgent item in the project.</li>
+          <li><b>Row-level security</b> behind the application scoping.</li>
+          <li>Minors' safeguards: a feedback safety check for the model's tone. <b>Not consent</b> — the lawful basis is Article 6(1)(e), public task, which is what makes Article 8's digital age of consent inapplicable.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPERATIONS -->
+  <section id="ops">
+    <p class="eyebrow">13 — Operations</p>
+    <h2>Observability &amp; Operations</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Today</h3>
+        <ul class="clean">
+          <li><b>Health.</b> <code class="inline">GET /health</code> returns a simple OK for uptime checks and proxy probes.</li>
+          <li><b>Logs.</b> Combined stdout/stderr appended to <code class="inline">/var/log/rise/app.log</code>; deploy output visible via <code class="inline">journalctl</code>.</li>
+          <li><b>LLM accounting.</b> Model and token counts recorded per AI message for cost visibility.</li>
+          <li><b>Recovery.</b> systemd auto-restart; stateless app means a restart is always safe.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Recommended for launch</h3>
+        <ul class="clean">
+          <li>Log rotation for <code class="inline">app.log</code> (logrotate) to bound disk use.</li>
+          <li>Automated PostgreSQL backups with off-host retention + a tested restore.</li>
+          <li>External uptime monitoring on <code class="inline">/health</code> with alerting.</li>
+          <li>Post-deploy health check with automatic rollback on failure.</li>
+          <li>Error aggregation / structured logging as volume grows.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout warn"><strong>Backups are a launch prerequisite.</strong> The pilot can run on a single host, but production on Marabunta infrastructure must include scheduled, off-host database backups with a rehearsed restore before real cohorts depend on the data.</div>
+  </section>
+
+  <!-- SCALE -->
+  <section id="scale">
+    <p class="eyebrow">14 — Evolution</p>
+    <h2>Scalability &amp; Future Architecture</h2>
+    <p class="lead">The current single-process design comfortably serves classroom-scale, bursty pilot usage. The modular seams mean it can grow along well-understood axes without a rewrite.</p>
+    <div class="two-col">
+      <div class="card">
+        <h3>Known bottlenecks</h3>
+        <ul class="clean">
+          <li><b>Synchronous LLM calls</b> in the request path dominate latency and hold a connection open for the duration — the single external dependency on the hot path.</li>
+          <li><b>Single Node process</b> and a co-located database share one host's resources.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Growth path</h3>
+        <ul class="clean">
+          <li>Run the LLM call asynchronously (job + polling / websockets) so requests return fast.</li>
+          <li>Scale the stateless app horizontally behind the proxy; sessions already live in Postgres.</li>
+          <li>Move PostgreSQL to a managed/replicated instance; add read replicas if needed.</li>
+          <li>Abstract the LLM provider (Scaleway / self-hosted Qwen / alternative) behind the existing module boundary — already exercised once, when Together.ai was replaced by Scaleway with no change outside <code class="inline">llm/llm.js</code>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout ok"><strong>Provider-agnostic by design.</strong> Because content, AI, email, and persistence sit behind module boundaries and nothing is tied to a proprietary cloud, RISE can move from one VPS to Marabunta's infrastructure, a cloud provider, or an on-prem school appliance with configuration changes rather than re-architecture.</div>
+  </section>
+
+  <!-- ALTERNATIVE DEPLOYMENT MODELS -->
+  <section id="alt">
+    <p class="eyebrow">15 — Options</p>
+    <h2>Alternative Deployment Models</h2>
+    <p class="lead">The default target is a single managed host (a VPS or the infrastructure provided by Marabunta). Because the stack is provider-agnostic and every external dependency sits behind a module boundary, two other models are fully supported without re-architecture — a fully on-premises install inside a school's own network with a locally hosted LLM, and a managed cloud deployment on AWS.</p>
+
+    <h3 class="block">Option A — On-premises in the school network, with a locally hosted LLM</h3>
+    <p class="note" style="margin-bottom:16px">The entire platform — application, database, and the language model — runs on a machine inside the school's own network. Nothing about a student's practice ever leaves the building. This is the strongest possible privacy posture for processing minors' and SEN students' data, and it keeps working even with poor or no internet connectivity.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 880 320" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs><marker id="al" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0040a1"/></marker></defs>
+        <!-- LAN boundary -->
+        <rect x="30" y="40" width="700" height="255" rx="16" fill="#faf8ff" stroke="#067047" stroke-width="2" stroke-dasharray="7 5"/>
+        <text x="50" y="66" font-size="13" font-weight="800" fill="#067047">School network (LAN) — no data leaves the building</text>
+        <!-- devices -->
+        <rect x="60" y="120" width="150" height="110" rx="10" fill="#dae2ff" stroke="#0040a1"/>
+        <text x="135" y="168" text-anchor="middle" font-size="12.5" font-weight="700" fill="#131b2e">Student &amp;</text>
+        <text x="135" y="186" text-anchor="middle" font-size="12.5" font-weight="700" fill="#131b2e">teacher devices</text>
+        <text x="135" y="206" text-anchor="middle" font-size="10.5" fill="#737785">Browser</text>
+        <!-- app -->
+        <rect x="270" y="90" width="180" height="80" rx="10" fill="#eaedff" stroke="#0056d2"/>
+        <text x="360" y="122" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0040a1">RISE app</text>
+        <text x="360" y="141" text-anchor="middle" font-size="10.5" fill="#737785">Node · nginx (local TLS)</text>
+        <!-- postgres -->
+        <rect x="270" y="195" width="180" height="70" rx="10" fill="#d8f7e8" stroke="#067047"/>
+        <text x="360" y="227" text-anchor="middle" font-size="12.5" font-weight="700" fill="#131b2e">PostgreSQL</text>
+        <text x="360" y="245" text-anchor="middle" font-size="10.5" fill="#737785">content · sessions · feedback</text>
+        <!-- local LLM -->
+        <rect x="510" y="120" width="195" height="110" rx="10" fill="#fff1c7" stroke="#92400e"/>
+        <text x="607" y="158" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0040a1">Local LLM runtime</text>
+        <text x="607" y="177" text-anchor="middle" font-size="10.5" fill="#737785">Ollama / vLLM · Qwen</text>
+        <text x="607" y="194" text-anchor="middle" font-size="10.5" fill="#737785">on-prem GPU / CPU</text>
+        <!-- arrows -->
+        <line x1="210" y1="160" x2="266" y2="140" stroke="#0040a1" stroke-width="1.8" marker-end="url(#al)"/>
+        <line x1="360" y1="170" x2="360" y2="191" stroke="#0040a1" stroke-width="1.8" marker-end="url(#al)"/>
+        <line x1="450" y1="150" x2="506" y2="160" stroke="#92400e" stroke-width="1.8" marker-end="url(#al)"/>
+        <text x="480" y="140" text-anchor="middle" font-size="10" fill="#737785">local call</text>
+        <!-- optional offline content import -->
+        <rect x="760" y="40" width="100" height="60" rx="10" fill="#ffffff" stroke="#737785" stroke-dasharray="5 4"/>
+        <text x="810" y="66" text-anchor="middle" font-size="10.5" font-weight="700" fill="#131b2e">Sheets</text>
+        <text x="810" y="82" text-anchor="middle" font-size="9" fill="#737785">optional import</text>
+        <line x1="760" y1="80" x2="452" y2="110" stroke="#737785" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#al)"/>
+      </svg>
+      <div class="legend">
+        <span><i style="background:#dae2ff;border-color:#0040a1"></i>Clients</span>
+        <span><i style="background:#eaedff;border-color:#0056d2"></i>App</span>
+        <span><i style="background:#d8f7e8;border-color:#067047"></i>Database</span>
+        <span><i style="background:#fff1c7;border-color:#92400e"></i>Local LLM</span>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:16px">
+      <div class="card">
+        <h3>Why choose it</h3>
+        <ul class="clean">
+          <li><b>Data sovereignty.</b> Student answers and all personal data stay on school hardware — a decisive advantage for GDPR compliance and minors' protection.</li>
+          <li><b>Works offline.</b> No dependence on internet uptime or a third-party AI provider during lessons.</li>
+          <li><b>No per-token cost.</b> Once the hardware is in place, AI feedback has no marginal usage bill.</li>
+          <li><b>Full control.</b> The school owns the model, the data, and the update cadence.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What it requires &amp; how it works</h3>
+        <ul class="clean">
+          <li>A capable on-prem machine — ideally a modest GPU, or a strong multi-core CPU for smaller models — running an open model (e.g. Qwen) via <code class="inline">Ollama</code> or <code class="inline">vLLM</code>.</li>
+          <li>Only the <b>LLM provider module</b> changes: it points at the local model's OpenAI-compatible endpoint instead of Scaleway. The rest of the app is identical.</li>
+          <li>App, PostgreSQL, and nginx run on the same box (or two); content is imported once from Sheets, then the install can be fully offline.</li>
+          <li><b>Trade-offs:</b> local IT must maintain the box and apply updates; a locally hostable model may score below a hosted frontier model, so a short quality check per language is advised.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="block">Option B — Managed cloud deployment on AWS</h3>
+    <p class="note" style="margin-bottom:16px">For scale, high availability, and managed operations, the same application maps cleanly onto standard AWS building blocks — nothing in the code changes, only where each piece runs.</p>
+    <div class="two-col">
+      <div class="card">
+        <h3>Reference mapping</h3>
+        <ul class="clean">
+          <li><b>Compute:</b> the Node app on EC2, or containerised on ECS/Fargate behind an Application Load Balancer (TLS via ACM).</li>
+          <li><b>Database:</b> Amazon RDS for PostgreSQL — managed backups, patching, and optional Multi-AZ failover.</li>
+          <li><b>AI:</b> keep Scaleway, or switch to Amazon Bedrock (Qwen / other models) to keep inference inside AWS — noting that an EU region would be a requirement, not a preference.</li>
+          <li><b>Static &amp; backups:</b> S3 (optionally CloudFront); <b>logs/metrics:</b> CloudWatch; <b>secrets:</b> Secrets Manager / SSM.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Trade-offs</h3>
+        <ul class="clean">
+          <li><b>Pros:</b> elastic scaling, managed DB backups and HA, first-class monitoring, easy horizontal scale of the stateless app.</li>
+          <li><b>Cons:</b> higher and usage-based cost, more operational surface than a single VPS.</li>
+          <li><b>GDPR:</b> pin all services to an EU region (e.g. <code class="inline">eu-central-1</code>) and keep student data within EU data residency.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="block">At a glance</h3>
+    <table class="t">
+      <tr><th>&nbsp;</th><th>Managed VPS / Marabunta <span class="pill p-green" style="margin-left:6px">default</span></th><th>On-prem + local LLM</th><th>AWS cloud</th></tr>
+      <tr><td>Data location</td><td>Vendor / partner host</td><td>Inside the school</td><td>AWS region (choose EU)</td></tr>
+      <tr><td>AI inference</td><td>Scaleway, Paris (hosted)</td><td>Local model (Ollama / vLLM)</td><td>Bedrock, EU region</td></tr>
+      <tr><td>Internet needed at runtime</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+      <tr><td>Ongoing cost profile</td><td>Low, fixed</td><td>Hardware up-front, low run</td><td>Usage-based, higher</td></tr>
+      <tr><td>Scaling &amp; HA</td><td>Manual, single host</td><td>Single site</td><td>Managed, elastic</td></tr>
+      <tr><td>Best for</td><td>Pilot &amp; launch</td><td>Max privacy / low connectivity</td><td>Large multi-school scale</td></tr>
+    </table>
+    <div class="callout ok"><strong>One codebase, three targets.</strong> The same RISE application runs in all three models — the only thing that changes is configuration and which module endpoints are wired up. That portability is a deliberate architectural goal, not an afterthought.</div>
+  </section>
+
+  <footer>
+    RISE — Architecture &amp; Infrastructure Document · v2.1 · 2026-09-14 · Zoran Krnetić (PR BRIGHTNESS)
+  </footer>
+</div>
+</body>
+</html>

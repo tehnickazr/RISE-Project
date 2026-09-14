@@ -1,0 +1,20 @@
+[Unit]
+Description=RISE PoC application server
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/apps/rise/current
+EnvironmentFile=/opt/apps/rise/shared/.env
+ExecStart=/usr/bin/node backend/src/server.js
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=20
+StandardOutput=append:/var/log/rise/app.log
+StandardError=append:/var/log/rise/app.log
+
+[Install]
+WantedBy=multi-user.target

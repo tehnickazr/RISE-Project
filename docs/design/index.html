@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RISE — Visual Design Document v1.3</title>
+<style>
+/* ============================================================
+   RISE — Visual Design Document
+   Tokens are extracted verbatim from frontend/src/index.css, which is the
+   single source: if a value here and a value there disagree, the stylesheet
+   is right and this document is stale. It also dogfoods the system it
+   documents — every component below is rendered, not screenshotted.
+   ============================================================ */
+:root{
+  --background:#faf8ff;
+  --surface:#ffffff;
+  --surface-low:#f2f3ff;
+  --surface-container:#eaedff;
+  --surface-high:#e2e7ff;
+  --text:#131b2e;
+  --text-muted:#424654;
+  --outline:#c3c6d6;
+  --outline-strong:#737785;
+  --primary:#0040a1;
+  --primary-bright:#0056d2;
+  --primary-soft:#dae2ff;
+  --success:#067047;
+  --success-soft:#d8f7e8;
+  --warning:#92400e;
+  --warning-soft:#fff1c7;
+  --error:#ba1a1a;
+  --error-soft:#ffdad6;
+  --shadow:0 2px 14px rgba(19,27,46,.06);
+  --shadow-hover:0 8px 24px rgba(19,27,46,.09);
+  --radius:8px;
+  --radius-lg:16px;
+  --page-max:1120px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;}
+html{background:var(--background);scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:var(--text);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  background:
+    linear-gradient(180deg, rgba(218,226,255,.5) 0, rgba(250,248,255,0) 340px),
+    var(--background);
+}
+a{color:var(--primary);}
+
+/* ---- Layout shell ---- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:14px clamp(16px,4vw,48px);
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(195,198,214,.6);
+}
+.topbar nav{display:flex;flex-wrap:wrap;gap:4px;}
+.topbar nav a{
+  font-size:13px;font-weight:650;text-decoration:none;color:var(--text-muted);
+  padding:6px 10px;border-radius:6px;white-space:nowrap;
+}
+.topbar nav a:hover{background:var(--surface-low);color:var(--primary);}
+.topbar .mark{display:flex;align-items:center;gap:12px;}
+.topbar .mark svg{width:96px;height:auto;}
+.wrap{width:min(var(--page-max),calc(100% - 48px));margin:0 auto;padding:40px 0 80px;}
+
+/* ---- Cover ---- */
+.cover{
+  border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);
+  background:var(--surface);box-shadow:var(--shadow);
+  padding:44px;margin-bottom:16px;position:relative;overflow:hidden;
+}
+.cover::after{
+  content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;
+  background:radial-gradient(circle, rgba(0,86,210,.10), rgba(0,86,210,0) 70%);
+}
+.cover svg.logo{width:200px;height:auto;margin-bottom:22px;}
+.cover h1{font-size:44px;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:0 0 10px;}
+.cover .sub{font-size:18px;color:var(--text-muted);max-width:640px;line-height:1.6;margin:0 0 24px;}
+.meta-grid{display:flex;flex-wrap:wrap;gap:10px 28px;font-size:14px;position:relative;}
+.meta-grid div{display:flex;flex-direction:column;}
+.meta-grid dt{color:var(--text-muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.meta-grid dd{margin:2px 0 0;font-weight:650;}
+
+/* ---- Sections ---- */
+section{
+  border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);
+  background:var(--surface);box-shadow:var(--shadow);
+  padding:34px;margin-top:22px;scroll-margin-top:80px;
+}
+.eyebrow{color:var(--primary);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px;}
+section>h2{font-size:28px;font-weight:700;letter-spacing:-.01em;margin:0 0 8px;}
+section>p.lead{color:var(--text-muted);font-size:16px;line-height:1.6;max-width:760px;margin:0 0 24px;}
+h3.block{font-size:16px;font-weight:700;margin:28px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(195,198,214,.5);}
+h3.block:first-of-type{margin-top:8px;}
+.note{color:var(--text-muted);font-size:13.5px;line-height:1.6;}
+.grid{display:grid;gap:16px;}
+
+/* ---- Swatches ---- */
+.swatches{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+.swatch{border:1px solid rgba(195,198,214,.6);border-radius:var(--radius);overflow:hidden;background:var(--surface);}
+.swatch .chip{height:74px;}
+.swatch .info{padding:9px 11px;}
+.swatch .name{font-size:12.5px;font-weight:700;}
+.swatch .hex{font-size:11.5px;color:var(--text-muted);font-family:"SF Mono",Menlo,Consolas,monospace;text-transform:uppercase;margin-top:2px;}
+.swatch .role{font-size:11px;color:var(--text-muted);margin-top:3px;}
+
+/* token table */
+table.tokens{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;margin-top:6px;
+  border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);overflow:hidden;}
+table.tokens th,table.tokens td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(195,198,214,.4);}
+table.tokens th{background:var(--surface-low);color:var(--text-muted);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+table.tokens tr:last-child td{border-bottom:none;}
+table.tokens td code,code.inline{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;background:var(--surface-low);padding:1px 6px;border-radius:4px;color:#b3266b;}
+.dot{display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.08);vertical-align:-2px;margin-right:8px;}
+
+/* ---- Type specimens ---- */
+.type-row{display:flex;align-items:baseline;gap:20px;padding:14px 0;border-bottom:1px solid rgba(195,198,214,.4);flex-wrap:wrap;}
+.type-row:last-child{border-bottom:none;}
+.type-spec{flex:0 0 150px;font-size:12px;color:var(--text-muted);font-family:"SF Mono",Menlo,monospace;}
+.t-display{font-size:48px;font-weight:700;letter-spacing:-.02em;line-height:1.1;}
+.t-h1{font-size:32px;font-weight:700;line-height:1.25;}
+.t-h2{font-size:22px;font-weight:650;line-height:1.35;}
+.t-h3{font-size:18px;font-weight:650;line-height:1.4;}
+.t-bodylg{font-size:18px;font-weight:400;line-height:1.6;}
+.t-body{font-size:16px;font-weight:400;line-height:1.5;}
+.t-label{font-size:14px;font-weight:500;letter-spacing:.01em;}
+.t-labelsm{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:var(--text-muted);}
+
+/* ---- Spacing ---- */
+.space-demo{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;}
+.space-demo .item{text-align:center;}
+.space-demo .bar{background:var(--primary-soft);border:1px solid var(--primary-bright);border-radius:4px;width:34px;}
+.space-demo .lab{font-size:11.5px;color:var(--text-muted);margin-top:6px;font-family:"SF Mono",Menlo,monospace;}
+
+/* ---- Elevation ---- */
+.elev-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+.elev-card{background:var(--surface);border:1px solid rgba(195,198,214,.5);border-radius:var(--radius-lg);padding:20px;min-height:110px;}
+.elev-0{box-shadow:none;}
+.elev-1{box-shadow:var(--shadow);}
+.elev-2{box-shadow:var(--shadow-hover);}
+.elev-3{box-shadow:0 18px 46px rgba(19,27,46,.14);}
+.elev-card .t{font-weight:700;font-size:14px;}
+.elev-card .d{font-size:12px;color:var(--text-muted);margin-top:6px;font-family:"SF Mono",Menlo,monospace;}
+
+/* ---- Radius ---- */
+.radius-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+.radius-swatch{height:80px;background:var(--primary-soft);border:1.5px solid var(--primary-bright);}
+.radius-label{font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center;font-family:"SF Mono",Menlo,monospace;}
+
+/* ============================================================
+   COMPONENT LIBRARY — reproduced from index.css
+   ============================================================ */
+.demo{
+  border:1px dashed rgba(195,198,214,.9);border-radius:var(--radius-lg);
+  background:linear-gradient(180deg, rgba(218,226,255,.28), rgba(250,248,255,0) 120px), var(--surface);
+  padding:24px;margin-bottom:10px;
+  display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+}
+.demo.col{flex-direction:column;align-items:stretch;}
+
+.button,button.b{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1px solid transparent;border-radius:var(--radius);padding:9px 16px;
+  min-height:40px;background:var(--surface);color:var(--primary);font:inherit;font-weight:650;
+  text-decoration:none;cursor:pointer;
+  transition:background 140ms ease,color 140ms ease,border-color 140ms ease,box-shadow 140ms ease;
+}
+.button.primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 2px 8px rgba(0,64,161,.18);}
+.button.primary:hover{background:var(--primary-bright);border-color:var(--primary-bright);}
+.button.secondary{color:var(--text);border-color:var(--outline);background:rgba(255,255,255,.78);}
+.button.secondary:hover{border-color:var(--primary);color:var(--primary);background:var(--surface);}
+.button.ghost{color:var(--primary);border-color:var(--outline);background:var(--surface);}
+.button.ghost:hover{color:#fff;border-color:var(--primary);background:var(--primary);}
+.button.danger{color:var(--error);border-color:rgba(186,26,26,.28);background:var(--surface);}
+.button.danger:hover{color:#fff;border-color:var(--error);background:var(--error);}
+/* Disabled changes material, not brightness — see section 08. Every variant
+   converges, so this single rule intentionally overrides primary/secondary/
+   ghost/danger above. */
+.button.disabled{background:var(--surface-container);border-color:var(--outline);
+  color:var(--text-muted);box-shadow:none;cursor:not-allowed;}
+.button.focusring{outline:2px solid var(--primary-bright);outline-offset:2px;}
+
+/* The v1.0 treatment, kept only for the before/after in section 08. */
+.button.was-disabled{opacity:.62;cursor:not-allowed;}
+
+/* --- switched-off states (08) --- */
+.field input:disabled,.field select:disabled,.field textarea:disabled{
+  background:var(--surface-container);border-color:var(--outline);color:var(--text-muted);
+  cursor:not-allowed;}
+.field input:read-only:not(:disabled),.field textarea:read-only:not(:disabled){
+  background:var(--surface-low);color:var(--text);cursor:text;}
+.field.was input:disabled{opacity:.62;background:var(--surface);color:var(--text);
+  border-color:var(--outline);}
+table.sessions tr.is-retired td:not(:first-child){color:var(--text-muted);}
+table.sessions tr.is-retired td:first-child{box-shadow:inset 3px 0 0 var(--outline-strong);}
+table.sessions.was tr.is-retired td{color:var(--text-muted);background:var(--surface-low);
+  box-shadow:none;}
+table.sessions.was tr.is-retired .linkish{color:var(--text-muted);}
+.linkish{color:var(--primary);font-weight:650;}
+.pill-retired{background:var(--surface-container);color:var(--text-muted);margin-left:8px;
+  font-size:11px;letter-spacing:.03em;text-transform:uppercase;}
+.row-sub{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+  color:var(--outline-strong);margin-top:2px;}
+.ba-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;width:100%;}
+.ba-grid > div{border:1px solid rgba(195,198,214,.6);border-radius:8px;padding:16px;
+  background:var(--surface);}
+.ba-grid h4{margin:0 0 4px;font-size:13px;font-weight:800;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--text-muted);}
+.ba-grid p.note{margin:0 0 14px;min-height:36px;}
+.state-defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;
+  width:100%;}
+.state-defs > div{border:1px solid rgba(195,198,214,.6);border-radius:8px;padding:16px;}
+.state-defs h4{margin:0 0 6px;font-size:15px;}
+.state-defs .tokenline{margin-top:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;color:var(--outline-strong);line-height:1.6;}
+
+.field{display:flex;flex-direction:column;gap:7px;color:var(--text-muted);font-size:14px;font-weight:650;max-width:340px;width:100%;}
+.field input,.field select,.field textarea{
+  width:100%;min-height:44px;border:1px solid var(--outline);border-radius:var(--radius);
+  background:var(--surface);color:var(--text);padding:10px 12px;font:inherit;font-size:16px;font-weight:400;
+  transition:border-color 140ms ease,box-shadow 140ms ease;
+}
+.field textarea{min-height:96px;resize:vertical;}
+.field.focused input{border-color:var(--primary-bright);box-shadow:0 0 0 3px rgba(0,86,210,.14);outline:none;}
+
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;}
+.status-in_progress{background:var(--warning-soft);color:var(--warning);}
+.status-completed{background:var(--success-soft);color:var(--success);}
+.status-abandoned{background:#edf0f6;color:var(--text-muted);}
+.role-pill{background:var(--primary-soft);color:var(--primary);text-transform:capitalize;}
+.difficulty{display:inline-flex;align-items:center;min-height:28px;border-radius:999px;background:var(--surface-low);color:var(--text-muted);padding:5px 10px;font-size:13px;font-weight:700;}
+
+.overall-score{display:inline-flex;align-items:baseline;gap:8px;border-radius:999px;background:var(--primary-soft);color:var(--primary);padding:8px 12px;font-size:15px;font-weight:650;}
+.overall-score strong{color:var(--text);font-size:18px;}
+
+.scenario-card{
+  min-width:0;max-width:340px;border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);
+  padding:20px;background:var(--surface);box-shadow:var(--shadow);
+  transition:transform 140ms ease,box-shadow 140ms ease,border-color 140ms ease;
+}
+.scenario-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-hover);border-color:rgba(0,64,161,.22);}
+.scenario-card h3{margin:0 0 10px;font-size:18px;font-weight:650;}
+.scenario-card p{margin:0 0 18px;color:var(--text-muted);line-height:1.55;font-size:15px;}
+.scenario-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+
+.card-generic{border:1px solid rgba(195,198,214,.72);border-radius:var(--radius-lg);padding:24px;background:var(--surface);box-shadow:var(--shadow);}
+.question-text{color:var(--text);font-size:18px;line-height:1.65;margin:6px 0 0;}
+
+.feedback-card{position:relative;border:1px solid rgba(0,86,210,.22);border-radius:var(--radius-lg);
+  background:#f5f8ff;padding:24px 24px 24px 28px;box-shadow:var(--shadow);}
+.feedback-card::before{content:"";position:absolute;inset:18px auto 18px 0;width:4px;border-radius:0 999px 999px 0;background:var(--primary-bright);}
+.feedback-card h3{margin:0 0 14px;font-size:18px;}
+.criterion-list{list-style:none;padding:0;margin:0 0 16px;display:grid;gap:12px;}
+.criterion-list li{border-left:4px solid var(--primary-bright);border-radius:0 var(--radius) var(--radius) 0;background:rgba(255,255,255,.7);padding:10px 12px;}
+.criterion-list strong{font-size:14px;}
+.criterion-list p{margin:6px 0 0;color:var(--text-muted);font-size:13.5px;}
+.feedback-card blockquote{border-left:4px solid var(--outline-strong);padding:4px 0 4px 14px;margin:12px 0 0;color:var(--text-muted);font-style:italic;}
+
+.summary-card{border:1px solid rgba(6,112,71,.18);border-radius:var(--radius-lg);background:#f6fff9;padding:24px;box-shadow:var(--shadow);}
+.summary-card h3{margin:0 0 12px;}
+.encouragement{margin-top:14px;color:var(--success);font-weight:650;}
+
+.tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid rgba(195,198,214,.78);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);}
+.tabs button{min-height:36px;border:0;border-radius:6px;background:transparent;color:var(--text-muted);font:inherit;font-weight:750;padding:7px 14px;cursor:pointer;}
+.tabs button.active{background:var(--primary);color:#fff;}
+
+table.sessions{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;
+  border:1px solid rgba(195,198,214,.7);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow);font-size:15px;}
+table.sessions th,table.sessions td{text-align:left;vertical-align:middle;padding:13px 12px;border-bottom:1px solid rgba(195,198,214,.45);}
+table.sessions th{background:var(--surface-low);color:var(--text-muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;}
+table.sessions tbody tr:last-child td{border-bottom:none;}
+table.sessions tbody tr:hover{background:#fbfcff;}
+
+.modal-mini{width:100%;max-width:420px;border:1px solid rgba(195,198,214,.86);border-radius:var(--radius-lg);
+  background:var(--surface);box-shadow:0 18px 60px rgba(19,27,46,.18);padding:22px;}
+.modal-mini .mh{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;}
+.modal-mini .mh h3{margin:0;}
+
+/* ---- constellation (verbatim from SkillConstellation.css) ---- */
+.skill-constellation{display:inline-flex;align-items:center;justify-content:center;width:220px;height:64px;opacity:0;transform:translate(-8px,-8px) scale(.96);pointer-events:none;transition:opacity 180ms ease,transform 180ms ease;}
+.skill-constellation svg{display:block;}
+.skill-constellation.active{opacity:1;transform:translate(0,-8px) scale(1);}
+.constellation-lines line{stroke:#c8d2f0;stroke-width:1.5;stroke-linecap:round;}
+.energy-lines line{stroke:url(#energyGradient);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:18 80;stroke-dashoffset:100;opacity:0;}
+.skill-constellation.active .energy-lines line{opacity:1;animation:energyFlow 1.8s ease-in-out infinite;}
+.energy-lines line:nth-child(2){animation-delay:.15s;}
+.energy-lines line:nth-child(3){animation-delay:.3s;}
+.energy-lines line:nth-child(4){animation-delay:.45s;}
+.energy-lines line:nth-child(5){animation-delay:.6s;}
+.energy-lines line:nth-child(6){animation-delay:.75s;}
+.constellation-nodes circle{fill:#6f8fe8;opacity:.7;transform-box:fill-box;transform-origin:center;}
+.skill-constellation.active .constellation-nodes circle{animation:nodePulse 1.6s ease-in-out infinite;}
+.constellation-nodes circle:nth-child(2){animation-delay:.2s;}
+.constellation-nodes circle:nth-child(3){animation-delay:.4s;}
+.constellation-nodes circle:nth-child(4){animation-delay:.6s;}
+.constellation-nodes circle:nth-child(5){animation-delay:.8s;}
+.constellation-nodes circle:nth-child(6){animation-delay:1s;}
+.traveler{fill:#8fb3ff;filter:url(#softGlow);opacity:0;}
+.skill-constellation.active .traveler{opacity:1;animation:travelPath 2.4s ease-in-out infinite;}
+@keyframes energyFlow{from{stroke-dashoffset:100;}to{stroke-dashoffset:0;}}
+@keyframes nodePulse{0%,100%{opacity:.55;transform:scale(1);}50%{opacity:1;transform:scale(1.35);}}
+@keyframes travelPath{0%{transform:translate(24px,34px);}18%{transform:translate(68px,18px);}36%{transform:translate(112px,34px);}54%{transform:translate(156px,16px);}72%{transform:translate(198px,30px);}90%{transform:translate(158px,50px);}100%{transform:translate(24px,34px);}}
+
+/* ---- browser frame + screen mockups ---- */
+.browser{border:1px solid rgba(195,198,214,.8);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-hover);background:var(--surface);}
+.browser .bar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#eef0f6;border-bottom:1px solid rgba(195,198,214,.6);}
+.browser .dots{display:flex;gap:6px;}
+.browser .dots i{width:11px;height:11px;border-radius:50%;display:block;}
+.browser .dots i:nth-child(1){background:#ff5f57;}
+.browser .dots i:nth-child(2){background:#febc2e;}
+.browser .dots i:nth-child(3){background:#28c840;}
+.browser .url{flex:1;background:var(--surface);border:1px solid rgba(195,198,214,.7);border-radius:999px;padding:5px 12px;font-size:12px;color:var(--text-muted);font-family:"SF Mono",Menlo,monospace;}
+.browser .canvas{padding:26px 24px 30px;background:linear-gradient(180deg, rgba(218,226,255,.5) 0, rgba(250,248,255,0) 220px), var(--background);}
+.screen-caption{font-size:13px;color:var(--text-muted);margin:10px 2px 26px;line-height:1.55;}
+.screen-caption b{color:var(--text);}
+
+.m-header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px;}
+.m-header svg{width:120px;height:auto;}
+.m-avatar{width:44px;height:44px;border-radius:999px;background:var(--primary);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,64,161,.18);}
+.m-profession-h{color:var(--text-muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.02em;margin:26px 0 14px;}
+.m-scenario-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;list-style:none;padding:0;margin:0;}
+.m-scenario-grid .scenario-card{max-width:none;}
+.attempt-chips{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:16px 0 0;}
+.attempt-chips .link{min-height:34px;padding:6px 10px;font-size:13px;}
+.m-filters{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 16px;}
+.m-filters label{display:flex;flex-direction:column;gap:7px;color:var(--text-muted);font-size:14px;font-weight:650;}
+.m-filters select{min-width:200px;min-height:44px;border:1px solid var(--outline);border-radius:var(--radius);background:var(--surface);color:var(--text);padding:10px 12px;font:inherit;font-size:15px;}
+.m-h1{font-size:32px;font-weight:700;letter-spacing:0;margin:0 0 6px;}
+/* --- teacher dashboard mockup (section 09) --- */
+.m-intro{color:var(--text-muted);font-size:16px;margin:6px 0 24px;max-width:70ch;}
+.m-tabs{display:inline-flex;gap:4px;margin:0 0 18px;padding:4px;
+  border:1px solid rgba(195,198,214,.78);border-radius:var(--radius);background:var(--surface);
+  box-shadow:var(--shadow);}
+.m-tabs span{min-height:36px;display:inline-flex;align-items:center;border-radius:6px;
+  color:var(--text-muted);font-weight:750;font-size:14px;padding:7px 14px;}
+.m-tabs span.active{background:var(--primary);color:#fff;}
+.m-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.m-kpi{border:1px solid rgba(195,198,214,.72);border-radius:var(--radius-lg);background:var(--surface);
+  box-shadow:var(--shadow);padding:16px 18px;}
+.m-kpi .lbl{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-muted);
+  margin-bottom:8px;letter-spacing:.02em;}
+.m-kpi .val{font-size:28px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums;}
+.m-kpi .sub{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.m-kpi.is-alert .val{color:var(--warning);}
+.m-panel{border:1px solid rgba(195,198,214,.72);border-radius:var(--radius-lg);background:var(--surface);
+  box-shadow:var(--shadow);padding:20px;}
+.m-combo{display:flex;flex-direction:column;gap:7px;color:var(--text-muted);font-size:14px;
+  font-weight:650;}
+.m-combo .ctrl{position:relative;display:flex;align-items:center;min-width:230px;min-height:44px;
+  border:1px solid var(--outline);border-radius:var(--radius);background:var(--surface);
+  color:var(--text);padding:10px 64px 10px 12px;font-size:15px;font-weight:400;}
+.m-combo .ctrl::after{content:"";position:absolute;right:14px;width:12px;height:8px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23424654' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / 12px 8px;}
+.m-combo .clear{position:absolute;right:34px;width:24px;height:24px;border-radius:999px;
+  background:var(--surface-container);color:var(--text-muted);font-size:15px;line-height:24px;
+  text-align:center;}
+.m-chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px;}
+.m-chips span{min-height:36px;display:inline-flex;align-items:center;border:1px solid var(--outline);
+  border-radius:999px;background:var(--surface);padding:6px 14px;font-size:14px;color:var(--text-muted);}
+.m-chips span.is-on{background:var(--primary);border-color:var(--primary);color:#fff;}
+.m-count{font-size:13px;color:var(--text-muted);margin:0 0 12px;}
+.sortmark{opacity:.45;font-size:10px;}
+table.sessions th.is-sorted{color:var(--primary);}
+.score{display:inline-flex;align-items:center;gap:8px;}
+.score b{font-variant-numeric:tabular-nums;min-width:34px;}
+.score-track{width:60px;height:6px;border-radius:999px;background:var(--surface-container);
+  overflow:hidden;}
+.score-track i{display:block;height:100%;border-radius:999px;background:var(--primary-bright);}
+.score.is-low b{color:var(--error);} .score.is-low .score-track i{background:var(--error);}
+.score.is-mid b{color:var(--warning);} .score.is-mid .score-track i{background:#d97706;}
+.score.is-high b{color:var(--success);} .score.is-high .score-track i{background:var(--success);}
+.score-empty{color:var(--outline-strong);}
+.score-delta{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;}
+.score-delta.up{color:var(--success);} .score-delta.down{color:var(--error);}
+.score-delta.flat{color:var(--text-muted);}
+.m-back{margin-bottom:18px;}
+
+/* ---- misc ---- */
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+ul.clean{margin:0;padding-left:20px;}
+ul.clean li{margin:6px 0;font-size:14px;line-height:1.55;}
+.callout{border-left:4px solid var(--primary-bright);background:#eef4fb;border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--text-muted);}
+.callout strong{color:var(--text);}
+.bp-row{display:flex;flex-wrap:wrap;gap:12px;}
+.bp{flex:1 1 200px;border:1px solid rgba(195,198,214,.6);border-radius:var(--radius);padding:14px 16px;background:var(--surface-low);}
+.bp .w{font-family:"SF Mono",Menlo,monospace;font-weight:700;color:var(--primary);}
+.bp .n{font-size:13px;color:var(--text-muted);margin-top:4px;}
+footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 10px;}
+/* The dashboard mockup is a fixed-width facsimile of a desktop screen. The
+   .browser frame clips, so on a narrow reading window the table has to scroll
+   inside its own box rather than disappear off the edge. */
+.scroll-x{overflow-x:auto;}
+@media(max-width:980px){
+  .m-kpis{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:640px){
+  .cover{padding:28px;}
+  .cover h1{font-size:32px;}
+  section{padding:22px;}
+  .topbar nav{display:none;}
+  .m-kpis{grid-template-columns:1fr;}
+}
+@media print{
+  @page{size:A4;margin:14mm 12mm;}
+  html,body{width:auto !important;background:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .topbar{display:none !important;}
+  .wrap{width:auto !important;max-width:none !important;margin:0 !important;padding:0 !important;}
+  .cover,section{box-shadow:none !important;max-width:100%;border:1px solid #b9bdcc !important;}
+  .cover::after{display:none !important;}
+  section{margin-top:14px;}
+  .demo,.browser,.scenario-card,.feedback-card,.summary-card,.card-generic,.elev-card,.swatch,table.tokens,table.sessions,.callout,.type-row,.bp{break-inside:avoid;page-break-inside:avoid;}
+  /* Large decorative shadows print as grey blocks — soften or drop them */
+  .browser,.scenario-card,.feedback-card,.summary-card,.card-generic,.tabs,table.sessions,.modal-mini,.auth-panel,.overall-score{box-shadow:none !important;}
+  .elev-1{box-shadow:0 2px 8px rgba(19,27,46,.10) !important;}
+  .elev-2{box-shadow:0 3px 10px rgba(19,27,46,.13) !important;}
+  .elev-3{box-shadow:0 5px 15px rgba(19,27,46,.16) !important;}
+  h2,h3.block{break-after:avoid;page-break-after:avoid;}
+}
+
+/* ---- added v1.2: settings, limits, help ---- */
+.num-input{width:84px;min-height:44px;padding:10px 12px;border:1px solid var(--outline);
+  border-radius:var(--radius);background:var(--surface);color:var(--text);font:inherit;
+  font-size:16px;font-variant-numeric:tabular-nums;}
+.num-input:disabled{background:var(--surface-container);border-color:var(--outline);
+  color:var(--text-muted);cursor:not-allowed;}
+.num-input.focused{border-color:var(--primary-bright);box-shadow:0 0 0 3px rgba(0,86,210,.14);outline:none;}
+.num-input.gap{border-color:var(--error);background:#fff7f6;}
+.period-demo{display:grid;grid-template-columns:108px 1fr;gap:10px;max-width:320px;}
+.period-demo select{min-height:44px;padding:10px 12px;border:1px solid var(--outline);
+  border-radius:var(--radius);background:var(--surface);font:inherit;font-size:16px;}
+
+.limit-demo{border:1px solid var(--outline);border-radius:var(--radius);padding:12px 16px 14px;max-width:460px;}
+.limit-demo legend{font-weight:700;font-size:15px;padding:0 6px;}
+.limit-demo .hint{color:var(--text-muted);font-size:13px;margin:0 0 10px;}
+.limit-row{display:flex;align-items:center;gap:8px;min-height:34px;font-size:14px;}
+.limit-row .dot{width:15px;height:15px;border-radius:999px;border:1.5px solid var(--outline-strong);
+  flex:0 0 auto;display:inline-block;}
+.limit-row .dot.on{border-color:var(--primary);border-width:4.5px;}
+.limit-row .muted{color:var(--text-muted);font-weight:400;font-size:13px;}
+
+.rail-demo{display:flex;flex-direction:column;gap:2px;padding:8px;border:1px solid var(--outline);
+  border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow);width:236px;}
+.rail-demo .item{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px;border-radius:var(--radius);color:var(--text-muted);font-weight:650;font-size:14.5px;}
+.rail-demo .item.on{background:var(--primary-soft);color:var(--primary);}
+.rail-demo .pip{padding:2px 7px;border-radius:999px;background:var(--error-soft);color:#93000a;
+  font-size:11px;font-weight:800;}
+.rail-demo .pip.ok{background:var(--success-soft);color:var(--success);}
+
+.gap-demo{display:flex;flex-direction:column;gap:3px;padding:12px 16px;border-radius:var(--radius);
+  border-left:3px solid var(--outline-strong);background:rgba(195,198,214,.16);max-width:560px;margin:0 0 10px;}
+.gap-demo b{font-size:14.5px;}
+.gap-demo span{font-size:13.5px;color:var(--text-muted);}
+.gap-demo.student{border-left-color:var(--error);background:var(--error-soft);}
+.gap-demo.student b{color:#93000a;}
+.gap-demo.done{border-left-color:var(--success);background:var(--success-soft);}
+.gap-demo.done b{color:var(--success);}
+
+.ro-contact{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--outline);
+  border-radius:var(--radius);background:var(--surface-container);max-width:420px;}
+.ro-contact a{color:var(--primary);font-weight:650;text-decoration:none;}
+
+.help-demo{border:1px solid var(--outline);border-radius:var(--radius);max-width:460px;overflow:hidden;}
+.help-demo .row{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;
+  border-bottom:1px solid rgba(195,198,214,.55);}
+.help-demo .row:last-child{border-bottom:0;}
+.help-demo .n{width:26px;height:26px;border-radius:999px;flex:0 0 auto;display:grid;place-items:center;
+  font-size:13px;font-weight:800;background:var(--primary-soft);color:var(--primary);}
+.help-demo .row.platform .n{background:var(--surface-container);color:var(--text-muted);}
+.help-demo .row.dpo .n{background:var(--warning-soft);color:var(--warning);}
+.help-demo b{display:block;font-size:14.5px;}
+.help-demo .what{display:block;font-size:13px;color:var(--text-muted);}
+.help-demo a{color:var(--primary);font-weight:650;text-decoration:none;font-size:13.5px;}
+
+.allowance-demo{display:flex;flex-direction:column;gap:2px;padding:10px 14px;max-width:620px;
+  border-left:3px solid var(--outline);background:rgba(195,198,214,.14);
+  border-radius:0 var(--radius) var(--radius) 0;margin:0 0 10px;}
+.allowance-demo b{font-size:14px;}
+.allowance-demo span{font-size:13px;color:var(--text-muted);}
+.allowance-demo.spent{border-left-color:var(--warning);background:var(--warning-soft);}
+.allowance-demo.spent b{color:var(--warning);}
+
+.lvl{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:1px;
+  min-height:44px;min-width:104px;padding:5px 14px;border:1px solid var(--outline);
+  border-radius:var(--radius);background:var(--surface);color:var(--primary);font-weight:650;font-size:14px;}
+.lvl small{font-size:11px;font-weight:600;color:var(--outline-strong);}
+.lvl.done{border-color:rgba(6,112,71,.4);background:var(--success-soft);color:var(--success);}
+.lvl.done small{color:var(--success);}
+.lvl.doing{border-color:rgba(217,119,6,.45);background:var(--warning-soft);color:var(--warning);}
+.lvl.doing small{color:var(--warning);}
+.lvl.spent{opacity:.55;border-style:dashed;}
+.meta-left{font-size:12px;font-weight:650;color:var(--text-muted);}
+.meta-left.spent{color:var(--warning);}
+.meta-left.waiting{color:var(--primary);font-weight:600;}
+.notice-prose{max-width:620px;font-size:14.5px;}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<div class="topbar">
+  <div class="mark">
+    <!-- RISE wordmark -->
+    <svg viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE">
+      <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+      <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+      <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+      <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+      <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+    </svg>
+  </div>
+  <nav>
+    <a href="#brand">Brand</a>
+    <a href="#logo">Logo</a>
+    <a href="#color">Color</a>
+    <a href="#type">Type</a>
+    <a href="#space">Spacing</a>
+    <a href="#elevation">Elevation</a>
+    <a href="#components">Components</a>
+    <a href="#states">States</a>
+    <a href="#screens">Screens</a>
+    <a href="#motion">Motion</a>
+    <a href="#a11y">Accessibility</a>
+    <a href="#responsive">Responsive</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <!-- ================= COVER ================= -->
+  <div class="cover">
+    <svg class="logo" viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE logo">
+      <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+      <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+      <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+      <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+      <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+    </svg>
+    <h1>Visual Design Document</h1>
+    <p class="sub">The RISE design system — the brand, color, typography, spacing, components, and motion that make the AI Interview Coach feel like a calm, supportive partner.</p>
+    <dl class="meta-grid">
+      <div><dt>Product</dt><dd>RISE — AI Interview Coach</dd></div>
+      <div><dt>Document</dt><dd>Visual Design / Design System</dd></div>
+      <div><dt>Version</dt><dd>1.3</dd></div>
+      <div><dt>Date</dt><dd>2026-09-14</dd></div>
+      <div><dt>Author</dt><dd>Zoran Krnetić (PR BRIGHTNESS)</dd></div>
+    </dl>
+    <p class="note" style="margin-top:20px;max-width:70ch">
+      <strong>v1.3 — 2026-09-14.</strong> Settings grew from one panel to four, which needed a
+      navigation and a way for a section to report its own state while closed: adds the
+      <a href="#components">settings rail and its status pip</a>, the
+      <a href="#components">gap banner</a>, and the controls those pages are built from — the
+      <b>number input</b>, the period pair, and the three-way limit control. The number input is the
+      correction this version exists for: it had been rendering with browser defaults because it was
+      in none of the shared field selectors, and a field that is not listed with the other fields is
+      a field that will drift. Adds the <a href="#notice-prose">rule for a school's own sentences</a>
+      in the privacy notice, the student's allowance and the fourth level-button state, and the help
+      sheet. The catalogue intro no longer promises unlimited repeats, because it is no longer true.
+      Sections 08–13 renumbered to make room. Sample rows in the administration
+      screens now use invented people: they had been real teachers and students,
+      named beside their personal email addresses, which is not something a
+      design system for a data-protection platform should ship.
+      <br><br>
+      <strong>v1.2 — 2026-09-03.</strong> The platform now has four audiences rather than two.
+      Adds the <a href="#screens">administration screens</a> — a school managing its own people and
+      content, and the platform operator managing schools — and the components the stylesheet had but
+      this document never described: the note block, the two pill families, the field hint, and what a
+      data table does on a phone. Records three rules the product learned the hard way, the first of
+      which cost the most to find: <b>a disabled control must say why it is disabled</b>.
+      <br><br>
+      <strong>v1.1 — 2026-08-27.</strong> Adds section 08, <a href="#states">Switched-off states</a>:
+      disabled, read-only, retired and muted history. Disabled now changes material rather than
+      brightness, replacing the blanket <code class="inline">opacity: .62</code> that v1.0 applied to
+      every off state alike. Sections 09–12 renumbered accordingly.
+    </p>
+  </div>
+
+  <!-- ================= BRAND ================= -->
+  <section id="brand">
+    <p class="eyebrow">01 — Foundations</p>
+    <h2>Brand &amp; Design Principles</h2>
+    <p class="lead">RISE is an AI Interview Coach. The interface must feel like a calm, supportive partner — never a complex technical tool — because many users arrive with interview-related anxiety. The style is <strong>Modern Corporate Minimalism</strong>: high legibility, intentional white space, and precise alignment that keep all focus on the student's performance and the AI's feedback.</p>
+    <div class="two-col">
+      <div class="card-generic">
+        <h3 class="block" style="margin-top:0">Personality</h3>
+        <ul class="clean">
+          <li><strong>Authoritative</strong> — trustworthy guidance, grounded in a professional blue.</li>
+          <li><strong>Supportive</strong> — encouraging tone, soft surfaces, generous spacing.</li>
+          <li><strong>Clear</strong> — a strict type hierarchy makes complex feedback scannable.</li>
+          <li><strong>Human</strong> — cutting-edge yet warm; approachable rounded shapes.</li>
+        </ul>
+      </div>
+      <div class="card-generic">
+        <h3 class="block" style="margin-top:0">Design principles</h3>
+        <ul class="clean">
+          <li><strong>Reduce cognitive load</strong> — less is more; strip non-essential decoration.</li>
+          <li><strong>Legibility first</strong> — deep-slate text, never pure black; roomy line height.</li>
+          <li><strong>Intentional white space</strong> — breathing room between sections.</li>
+          <li><strong>Accessible by default</strong> — WCAG-AA contrast, visible focus, labeled inputs.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:16px"><strong>Depth through tone, not weight.</strong> Elevation is achieved with ambient shadows and tonal layers, and modals use backdrop blur rather than heavy overlays — keeping the interface light and transparent.</div>
+  </section>
+
+  <!-- ================= LOGO ================= -->
+  <section id="logo">
+    <p class="eyebrow">02 — Foundations</p>
+    <h2>Logo</h2>
+    <p class="lead">The RISE wordmark sits inside a soft, rounded container silhouette — a nod to a speech bubble and a rising card. It is the single most important brand asset and appears in the app header, auth screens, and this document.</p>
+    <div class="two-col">
+      <div class="demo col" style="align-items:center;justify-content:center;min-height:180px">
+        <svg style="width:200px;height:auto" viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE on light">
+          <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+          <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+          <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+          <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+          <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+        </svg>
+        <div class="note">Primary — on light surface</div>
+      </div>
+      <div class="demo col" style="align-items:center;justify-content:center;min-height:180px;background:var(--primary)">
+        <svg style="width:200px;height:auto" viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE reversed">
+          <path fill="#ffffff" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+          <rect fill="#ffffff" x="88.84" y="41.64" width="17.85" height="65.74"/>
+          <path fill="#ffffff" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+          <polygon fill="#ffffff" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+          <path fill="#ffffff" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+        </svg>
+        <div class="note" style="color:rgba(255,255,255,.85)">Reversed — on primary surface</div>
+      </div>
+    </div>
+    <h3 class="block">Usage rules</h3>
+    <ul class="clean">
+      <li>In-app the logo renders at <code class="inline">150px</code> wide in the page header, <code class="inline">104px</code> on auth screens, scaling down to <code class="inline">106–122px</code> on small screens.</li>
+      <li>Keep clear space around the mark equal to the height of the container's corner radius; never crowd it with text or controls.</li>
+      <li>Do not recolor the wordmark into gradients, stretch it, rotate it, or add drop shadows. Use the near-black (<code class="inline">#1d1d1b</code>) mark on light, or the white reverse on primary.</li>
+    </ul>
+  </section>
+
+  <!-- ================= COLOR ================= -->
+  <section id="color">
+    <p class="eyebrow">03 — Foundations</p>
+    <h2>Color</h2>
+    <p class="lead">The palette centers on a trustworthy primary blue extracted from the brand. Surfaces use a cool, faintly violet white-space strategy that keeps cards distinct without hard borders. Functional colors are calibrated for immediate, unambiguous feedback during practice.</p>
+
+    <h3 class="block">Primary &amp; brand</h3>
+    <div class="grid swatches">
+      <div class="swatch"><div class="chip" style="background:#0040a1"></div><div class="info"><div class="name">Primary</div><div class="hex">#0040A1</div><div class="role">Actions, links, brand</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0056d2"></div><div class="info"><div class="name">Primary Bright</div><div class="hex">#0056D2</div><div class="role">Hover, focus glow, accents</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#dae2ff"></div><div class="info"><div class="name">Primary Soft</div><div class="hex">#DAE2FF</div><div class="role">Chips, score badge, tints</div></div></div>
+    </div>
+
+    <h3 class="block">Surfaces &amp; text</h3>
+    <div class="grid swatches">
+      <div class="swatch"><div class="chip" style="background:#faf8ff"></div><div class="info"><div class="name">Background</div><div class="hex">#FAF8FF</div><div class="role">App canvas</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffffff;box-shadow:inset 0 0 0 1px rgba(195,198,214,.6)"></div><div class="info"><div class="name">Surface</div><div class="hex">#FFFFFF</div><div class="role">Cards, panels</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f2f3ff"></div><div class="info"><div class="name">Surface Low</div><div class="hex">#F2F3FF</div><div class="role">Table head, insets</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#eaedff"></div><div class="info"><div class="name">Surface Container</div><div class="hex">#EAEDFF</div><div class="role">Grouped fills</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e2e7ff"></div><div class="info"><div class="name">Surface High</div><div class="hex">#E2E7FF</div><div class="role">Raised fills</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#131b2e"></div><div class="info"><div class="name">Text</div><div class="hex">#131B2E</div><div class="role">Headings, body</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#424654"></div><div class="info"><div class="name">Text Muted</div><div class="hex">#424654</div><div class="role">Secondary text, labels</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#c3c6d6"></div><div class="info"><div class="name">Outline</div><div class="hex">#C3C6D6</div><div class="role">Borders</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#737785"></div><div class="info"><div class="name">Outline Strong</div><div class="hex">#737785</div><div class="role">Quote bar, emphasis border</div></div></div>
+    </div>
+
+    <h3 class="block">Functional</h3>
+    <div class="grid swatches">
+      <div class="swatch"><div class="chip" style="background:#067047"></div><div class="info"><div class="name">Success</div><div class="hex">#067047</div><div class="role">Completed, encouragement</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#d8f7e8"></div><div class="info"><div class="name">Success Soft</div><div class="hex">#D8F7E8</div><div class="role">Completed pill bg</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#92400e"></div><div class="info"><div class="name">Warning</div><div class="hex">#92400E</div><div class="role">In-progress text</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#fff1c7"></div><div class="info"><div class="name">Warning Soft</div><div class="hex">#FFF1C7</div><div class="role">In-progress pill bg</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ba1a1a"></div><div class="info"><div class="name">Error</div><div class="hex">#BA1A1A</div><div class="role">Destructive, errors</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffdad6"></div><div class="info"><div class="name">Error Soft</div><div class="hex">#FFDAD6</div><div class="role">Error banner bg</div></div></div>
+    </div>
+
+    <div class="callout" style="margin-top:20px"><strong>Contrast.</strong> Primary <code class="inline">#0040A1</code> on white reaches ~8.6:1 and body text <code class="inline">#131B2E</code> on background reaches ~15:1 — both clear WCAG-AA (and AAA for body). Status pills pair a soft tinted background with a darker same-hue text so they stay legible at 12px.</div>
+  </section>
+
+  <!-- ================= TYPOGRAPHY ================= -->
+  <section id="type">
+    <p class="eyebrow">04 — Foundations</p>
+    <h2>Typography</h2>
+    <p class="lead">One family — <strong>Inter</strong> — across the entire product for a systematic, utilitarian feel. Display sizes use tight letter-spacing for a tech-forward edge; body copy uses generous 1.5–1.65 line height so long-form AI advice stays easy to scan.</p>
+    <div class="card-generic">
+      <div class="type-row"><div class="type-spec">Display · 48 / 700 · -0.02em</div><div class="t-display">Rise to the moment</div></div>
+      <div class="type-row"><div class="type-spec">H1 · 32 / 700</div><div class="t-h1">Interview practice, guided</div></div>
+      <div class="type-row"><div class="type-spec">H2 · 22 / 650</div><div class="t-h2">Your feedback for this answer</div></div>
+      <div class="type-row"><div class="type-spec">H3 · 18 / 650</div><div class="t-h3">Communication &amp; clarity</div></div>
+      <div class="type-row"><div class="type-spec">Body L · 18 / 400 · 1.65</div><div class="t-bodylg">Tell me about a time you resolved a difficult technical problem for a customer.</div></div>
+      <div class="type-row"><div class="type-spec">Body M · 16 / 400 · 1.5</div><div class="t-body">You explained the steps clearly and stayed calm. Next time, quantify the outcome to make the impact concrete.</div></div>
+      <div class="type-row"><div class="type-spec">Label · 14 / 500</div><div class="t-label">Email address</div></div>
+      <div class="type-row"><div class="type-spec">Label S · 12 / 600 · caps</div><div class="t-labelsm">Service Technician</div></div>
+    </div>
+    <div class="two-col" style="margin-top:16px">
+      <div class="callout"><strong>Weights in use.</strong> 400 body · 500 labels · 650 headings &amp; buttons · 700 H1 &amp; strong emphasis · 800 uppercase micro-labels (table headers, section eyebrows).</div>
+      <div class="callout"><strong>Hierarchy is enforced.</strong> Uppercase 12px/800 micro-labels group content (professions, table headers); they carry meaning through weight, not size.</div>
+    </div>
+  </section>
+
+  <!-- ================= SPACING ================= -->
+  <section id="space">
+    <p class="eyebrow">05 — Foundations</p>
+    <h2>Spacing &amp; Layout</h2>
+    <p class="lead">A <strong>4px base unit</strong> drives all rhythm. Desktop uses a fixed grid capped at <code class="inline">1280px</code> with 24px margins and gutters; mobile drops to 16px to reclaim screen. Generous vertical spacing between sections reinforces the minimal aesthetic.</p>
+    <h3 class="block">Spacing scale</h3>
+    <div class="space-demo">
+      <div class="item"><div class="bar" style="height:4px"></div><div class="lab">xs · 4</div></div>
+      <div class="item"><div class="bar" style="height:8px"></div><div class="lab">sm · 8</div></div>
+      <div class="item"><div class="bar" style="height:16px"></div><div class="lab">md · 16</div></div>
+      <div class="item"><div class="bar" style="height:24px"></div><div class="lab">lg · 24</div></div>
+      <div class="item"><div class="bar" style="height:32px"></div><div class="lab">xl · 32</div></div>
+      <div class="item"><div class="bar" style="height:48px"></div><div class="lab">2xl · 48</div></div>
+      <div class="item"><div class="bar" style="height:64px"></div><div class="lab">3xl · 64</div></div>
+    </div>
+    <h3 class="block">Grid &amp; container</h3>
+    <table class="tokens">
+      <tr><th>Token</th><th>Desktop</th><th>Mobile</th></tr>
+      <tr><td>Max content width</td><td><code>1280px</code></td><td>fluid, min <code>320px</code></td></tr>
+      <tr><td>Columns</td><td>12-column</td><td>4-column</td></tr>
+      <tr><td>Margin</td><td><code>24px</code></td><td><code>16px</code> → <code>12px</code></td></tr>
+      <tr><td>Gutter</td><td><code>24px</code></td><td><code>16px</code></td></tr>
+      <tr><td>Card grid</td><td colspan="2"><code>repeat(auto-fit, minmax(280px, 1fr))</code> — cards reflow from multi-column to single-column</td></tr>
+    </table>
+  </section>
+
+  <!-- ================= ELEVATION & SHAPE ================= -->
+  <section id="elevation">
+    <p class="eyebrow">06 — Foundations</p>
+    <h2>Elevation &amp; Shape</h2>
+    <p class="lead">Depth is quiet: diffuse ambient shadows and tonal layers, never hard drop shadows. Corners are rounded to strike a balance between a precise professional tool and an approachable coaching app.</p>
+    <h3 class="block">Elevation</h3>
+    <div class="grid elev-grid">
+      <div class="elev-card elev-0"><div class="t">Level 0 — Flat</div><div class="d">background</div></div>
+      <div class="elev-card elev-1"><div class="t">Level 1 — Card</div><div class="d">0 2px 14px / 6%</div></div>
+      <div class="elev-card elev-2"><div class="t">Level 2 — Hover</div><div class="d">0 8px 24px / 9%</div></div>
+      <div class="elev-card elev-3"><div class="t">Level 3 — Popover</div><div class="d">0 18px 46px / 14%</div></div>
+    </div>
+    <h3 class="block">Corner radius</h3>
+    <div class="grid radius-grid">
+      <div><div class="radius-swatch" style="border-radius:4px"></div><div class="radius-label">sm · 4px</div></div>
+      <div><div class="radius-swatch" style="border-radius:8px"></div><div class="radius-label">base · 8px</div></div>
+      <div><div class="radius-swatch" style="border-radius:16px"></div><div class="radius-label">lg · 16px</div></div>
+      <div><div class="radius-swatch" style="border-radius:999px;height:44px;margin-top:36px"></div><div class="radius-label">pill · 999px</div></div>
+    </div>
+    <div class="callout" style="margin-top:18px"><strong>When to use which.</strong> 8px for buttons, inputs, small cards · 16px for dashboard sections, panels, and modals · full pill exclusively for tags, status chips, and the score badge — a distinct language from actionable buttons.</div>
+  </section>
+
+  <!-- ================= COMPONENTS ================= -->
+  <section id="components">
+    <p class="eyebrow">07 — Library</p>
+    <h2>Components</h2>
+    <p class="lead">Live components reproduced from the production stylesheet. Every element here uses the same tokens the app ships with.</p>
+
+    <h3 class="block">Buttons</h3>
+    <div class="demo">
+      <span class="button primary">Start interview</span>
+      <span class="button secondary">Cancel</span>
+      <span class="button ghost">Review</span>
+      <span class="button danger">Delete</span>
+      <span class="button primary disabled">Submitting…</span>
+      <span class="button primary focusring">Focus state</span>
+    </div>
+    <p class="note">Primary = brand blue, white text, subtle shadow. Secondary = outlined neutral. Ghost = outlined, inverts to solid blue on hover. Danger = red text, fills red on hover. Focus = 2px <code class="inline">#0056D2</code> ring at 2px offset. Minimum height 40px (44–48px for primary actions and touch targets). Disabled drops the fill and the elevation entirely — see <a href="#states">Switched-off states</a>.</p>
+
+    <h3 class="block">Form fields</h3>
+    <div class="demo">
+      <label class="field">Email address
+        <input type="email" placeholder="you@school.edu" value="marija@skola.edu.rs">
+      </label>
+      <label class="field focused">Password <span class="note" style="font-weight:400">(focused)</span>
+        <input type="password" value="password">
+      </label>
+      <label class="field">Your answer
+        <textarea>I stayed calm, isolated the fault to the power supply, and walked the customer through the fix step by step.</textarea>
+      </label>
+    </div>
+    <p class="note">Labels are always visible (never placeholder-only). 44px min height, 1px outline; focus transitions to bright blue with a 3px soft glow.</p>
+
+    <h3 class="block">Number input</h3>
+    <div class="demo">
+      <input class="num-input" value="3">
+      <input class="num-input focused" value="15">
+      <input class="num-input" value="7" disabled>
+      <input class="num-input gap" value="">
+    </div>
+    <p class="note"><b>Everything but the width comes from the shared field treatment</b> — same 44px height, same 8px radius, same 1px outline, same 16px type, same focus ring. That is the whole rule: a number box is a field, and it is listed in the same selectors as every other field rather than given a parallel set of its own. A second definition of "what an input looks like" is a second thing to keep in step, and when it drifted the box came out square-cornered and 22px tall beside the fields around it.
+    <br><br>It holds at most three digits and usually sits inline beside a label or a radio, so it is fixed at <b>84px</b> instead of filling its container — full width would make a two-digit number look like a text field. <code class="inline">tabular-nums</code> keeps the digits from shifting as the value changes. Disabled is the ordinary disabled field: <code class="inline">--surface-container</code> fill, muted label, no fade. The fourth is a field whose blank would be visible to a reader — see the gap banner below.</p>
+
+    <h3 class="block">Period control</h3>
+    <div class="demo">
+      <span class="period-demo">
+        <input class="num-input" style="width:auto" value="24">
+        <select><option>months</option></select>
+      </span>
+    </div>
+    <p class="note">A retention period is <b>a number and a unit, never a sentence</b>. Typing "two years" into a text box would put those English words into the Serbian, French and Portuguese privacy notices, and nothing on screen would tell the person who typed it. The sentence is assembled per language at the point of display — which is also where Serbian gets its three plural forms (<b>24 meseca</b>, but <b>12 meseci</b>).</p>
+
+    <h3 class="block">Three-way limit control</h3>
+    <div class="demo col">
+      <fieldset class="limit-demo">
+        <legend>Attempts at the same interview</legend>
+        <p class="hint">A repeat attempt reuses questions the student has already seen a model answer for.</p>
+        <div class="limit-row"><span class="dot on"></span> Use the platform default <span class="muted">Platform default: 3</span></div>
+        <div class="limit-row"><span class="dot"></span> Limit this <input class="num-input" style="width:72px;min-height:38px" value="3" disabled></div>
+        <div class="limit-row"><span class="dot"></span> No limit</div>
+      </fieldset>
+    </div>
+    <p class="note">Three states, not a number with a magic value: <b>inherit</b>, <b>limit to n</b>, and <b>no limit</b>. The store keeps 0 for "no limit", but nobody types it — the number box never accepts 0, which is what stops a zero meant as "none allowed" being read as its exact opposite. The box stays visible but disabled while another choice is selected, showing the value that would apply. The platform console renders the same control without the first row, because there is nothing above it to inherit from.</p>
+
+    <h3 class="block">Settings rail</h3>
+    <div class="demo">
+      <nav class="rail-demo">
+        <span class="item">Content source</span>
+        <span class="item">Interview limits</span>
+        <span class="item">Privacy notice <span class="pip">1 empty</span></span>
+        <span class="item on">Help and contacts <span class="pip">not set</span></span>
+      </nav>
+    </div>
+    <p class="note">Settings outgrew one scrolling panel at four sections, and they do not fit in a tab row that already carries Users and Settings — nesting tabs inside tabs reads as two navigations arguing. The rail buys something a tab row cannot: <b>a permanent place for each section to carry a status</b>. "1 empty" is how an administrator learns the privacy notice is unfinished without opening it, and it is the only reason anyone would open that page a second time. The pip is red by default because the state it usually reports is an unfinished legal document, and green only when there is nothing left to report. Below 900px the rail lies down into a wrapping row.</p>
+
+    <h3 class="block">Gap banner</h3>
+    <div class="demo col">
+      <p class="gap-demo student"><b>4 fields are still empty.</b><span>3 of them appear, blank, in the notice a student reads — so the notice does not yet satisfy Article 13.</span></p>
+      <p class="gap-demo"><b>1 field is still empty.</b><span>Nothing a student reads is missing. The rest is in the staff notice.</span></p>
+      <p class="gap-demo done"><b>Every field is filled in. No placeholder appears in any notice.</b></p>
+    </div>
+    <p class="note">Three states, and the middle one is the point. A gap is only loud when <b>a student would see the blank</b>; a staff-only gap is worth reporting and not worth alarming anyone about. Counting every empty field the same way would have trained administrators to ignore the count, which is the one thing it cannot afford.</p>
+
+    <h3 class="block">Read-only contact</h3>
+    <div class="demo">
+      <p class="ro-contact"><b>RISE platform support</b><a href="#">support@riseproject.space</a></p>
+    </div>
+    <p class="note">One address, answered by one team, shown inside every school and editable by none of them — a school changing it would change who answers for every other school's students. Rendered as a contact rather than a disabled input, because it is not a field somebody failed to fill in.</p>
+
+    <h3 class="block">Help sheet</h3>
+    <div class="demo">
+      <div class="help-demo">
+        <div class="row"><span class="n">1</span><span><b>IT služba škole</b><span class="what">Nalog, lozinka, odeljenje.</span><a href="#">it@skola.example</a></span></div>
+        <div class="row platform"><span class="n">2</span><span><b>Nešto ne radi</b><span class="what">Intervju se ne otvara, nema povratne informacije.</span><a href="#">support@riseproject.space</a></span></div>
+        <div class="row dpo"><span class="n">3</span><span><b>Vaši podaci</b><span class="what">Ko ih vidi, koliko se čuvaju, brisanje.</span><a href="#">Pročitajte obaveštenje o privatnosti</a></span></div>
+      </div>
+    </div>
+    <p class="note"><b>Three destinations, numbered, and never one.</b> A student cannot reliably classify their own problem, so the sheet does not ask them to — it lists all three with one line each and puts the school first, because that is who knows them. The separation is not tidiness: a single "contact us" address routes erasure requests into an IT inbox with a one-month statutory clock running and nobody there with authority to answer. An entry with no address is <b>omitted entirely</b> rather than shown empty — unlike the privacy notice, a help sheet with <code class="inline">&lt;email&gt;</code> in it is worse than one with two entries.</p>
+
+    <h3 class="block">Status &amp; meta chips</h3>
+    <div class="demo">
+      <span class="pill status-completed">Completed</span>
+      <span class="pill status-in_progress">In progress</span>
+      <span class="pill status-abandoned">Abandoned</span>
+      <span class="pill role-pill">Student</span>
+      <span class="pill role-pill">Teacher</span>
+      <span class="difficulty">Intermediate</span>
+      <span class="overall-score">Overall <strong>4.2 / 5</strong></span>
+    </div>
+
+    <h3 class="block">Scenario card</h3>
+    <div class="demo">
+      <div class="scenario-card">
+        <h3>Technical troubleshooting</h3>
+        <p>Diagnose a field fault and walk the customer through the resolution, staying calm under pressure.</p>
+        <div class="scenario-meta">
+          <span class="difficulty">Intermediate</span>
+          <span class="button primary">Start</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="block">Question card</h3>
+    <div class="demo col">
+      <div class="card-generic">
+        <span class="pill status-in_progress" style="margin-bottom:12px">Question 2 of 5</span>
+        <p class="question-text">Tell me about a time you resolved a difficult technical problem for a customer. What was the outcome?</p>
+      </div>
+    </div>
+
+    <h3 class="block">AI feedback block</h3>
+    <div class="demo col">
+      <div class="feedback-card">
+        <h3>Feedback</h3>
+        <span class="overall-score" style="margin-bottom:14px">Overall <strong>4.0 / 5</strong></span>
+        <ul class="criterion-list">
+          <li><strong>Communication — 4.5 / 5</strong><p>Clear, well-sequenced explanation that a non-technical customer could follow.</p></li>
+          <li><strong>Problem solving — 3.5 / 5</strong><p>Good diagnosis; state the root cause explicitly and quantify the result.</p></li>
+        </ul>
+        <blockquote>"Improved answer: … I isolated the fault to the PSU within 10 minutes, replaced it, and confirmed the line was back to full throughput — cutting downtime by roughly half."</blockquote>
+      </div>
+    </div>
+    <p class="note">The AI feedback block is the signature component: a very light blue tint with a vertical brand-colored accent bar on the left, distinguishing AI coaching from user content. Each criterion gets its own left-accented row.</p>
+
+    <h3 class="block">Session summary</h3>
+    <div class="demo col">
+      <div class="summary-card">
+        <h3>Session summary</h3>
+        <span class="overall-score">Overall <strong>4.1 / 5</strong></span>
+        <p style="margin-top:14px"><strong>Strengths.</strong> You communicate calmly and structure answers well.</p>
+        <p style="margin-top:8px"><strong>To improve.</strong> Add concrete numbers to show impact.</p>
+        <p class="encouragement">Great progress — you're clearly interview-ready with a little more practice.</p>
+      </div>
+    </div>
+    <p class="note">Summary reuses the card pattern with a soft success-green tint and border to signal completion.</p>
+
+    <h3 class="block">Tabs</h3>
+    <div class="demo">
+      <div class="tabs">
+        <button class="active">Sessions</button>
+        <button>Students</button>
+        <button>Invites</button>
+      </div>
+    </div>
+
+    <h3 class="block">Sessions table (teacher)</h3>
+    <div class="demo col">
+      <table class="sessions">
+        <thead><tr><th>Student</th><th>Scenario</th><th>Status</th><th>Avg score</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Marija P.</td><td>Technical troubleshooting</td><td><span class="pill status-completed">Completed</span></td><td>4.2</td><td style="text-align:right"><span class="button ghost">Open</span></td></tr>
+          <tr><td>Nikola S.</td><td>Customer communication</td><td><span class="pill status-in_progress">In progress</span></td><td>—</td><td style="text-align:right"><span class="button ghost">Open</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">On phones the table collapses: each row becomes a card and cells stack with their column name shown via a <code class="inline">data-label</code> prefix.</p>
+
+    <h3 class="block">Modal &amp; error banner</h3>
+    <div class="demo" style="align-items:flex-start">
+      <div class="modal-mini">
+        <div class="mh"><h3>Invite user</h3><span class="button ghost" style="min-height:32px;padding:4px 10px">✕</span></div>
+        <label class="field" style="max-width:none">Email
+          <input type="email" placeholder="name@school.edu">
+        </label>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+          <span class="button secondary">Cancel</span><span class="button primary">Send invite</span>
+        </div>
+      </div>
+      <div style="flex:1 1 240px;min-width:220px">
+        <div style="border:1px solid rgba(186,26,26,.28);border-radius:8px;background:var(--error-soft);color:#93000a;font-size:14px;font-weight:600;padding:10px 12px">Error: Invalid email or password.</div>
+        <div style="border:1px solid rgba(195,198,214,.7);border-radius:8px;background:var(--surface-low);padding:12px 14px;font-size:14px;color:var(--text-muted);margin-top:12px">Session meta — <strong style="color:var(--text)">Status:</strong> In progress · <strong style="color:var(--text)">Question 2 / 5</strong></div>
+      </div>
+    </div>
+    <p class="note">Modals sit on a 38%-opacity slate backdrop with heavy soft shadow. Error banners use the soft-red surface with darker red text.</p>
+  </section>
+
+  <!-- ================= STATES ================= -->
+
+    <h3 class="block">Note block</h3>
+    <div class="demo col">
+      <div style="background:var(--surface-low);border-left:3px solid var(--primary);border-radius:var(--radius);padding:14px 16px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--primary);margin-bottom:6px;">Uvezeno</div>
+        <div>12 scenarija, 380 pitanja, 52 rubrike. 1 uklonjeno.</div>
+      </div>
+    </div>
+    <p class="note"><b>A labelled aside for a consequence the reader must not skip</b> — what an import just changed, why a scenario is retired. The label is the point: it says what kind of statement follows before the reader commits to the sentence. There is a <code class="inline">warn</code> variant in amber; it is for facts that carry a cost, never for emphasis. A note used to make ordinary text louder stops working the first time it matters.</p>
+
+    <h3 class="block">Pills — settled, and waiting</h3>
+    <div class="demo">
+      <span class="pill status-completed">u upotrebi</span>
+      <span class="pill status-completed">Aktivan</span>
+      <span class="pill status-in_progress">Pozvan</span>
+      <span class="pill status-in_progress">Poziv istekao</span>
+      <span class="pill status-abandoned">RETIRED</span>
+    </div>
+    <p class="note">Two families, and the distinction is <b>settled versus waiting</b>, not severity. A neutral pill states a fact that needs nobody — a role, the content version in use, an active account. An amber pill marks something waiting on a person: an unaccepted invitation, an open erasure request, an organisation with no administrator. Amber here is not a warning about danger; it is a queue.</p>
+
+    <h3 class="block">Field hint — including the disabled reason</h3>
+    <div class="demo col" style="max-width:460px">
+      <label class="field"><span>Nova lozinka</span><input type="password" value="abc"></label>
+      <p style="margin:0;font-size:13px;color:var(--text-muted)">Lozinka mora imati najmanje 10 znakova.</p>
+      <span class="button primary" aria-disabled="true" style="opacity:1;background:var(--surface-container);color:var(--text-muted);box-shadow:none;">Napravi nalog</span>
+    </div>
+    <p class="note"><b>A disabled control must say why it is disabled.</b> This is a rule the product learned the hard way: a registration form showed two filled-in password fields and an inert button, and the reader had no move at all. Whatever the cause — and in that case it was a browser autofill the page could not see — the state was indefensible. Name the unmet condition, in the reader's language, immediately below the control. The hint carries reasons, never decoration.</p>
+
+    <h3 class="block">Data table on a phone</h3>
+    <p class="note">Every table cell carries a <code class="inline">data-label</code>, and below the table breakpoint each <b>row becomes a card</b> with those labels as its field names — so a phone shows a readable record instead of a grid scrolling sideways. This is why a new column is not finished until it has its label: without one it simply loses its name on mobile, silently, and only for the readers least able to work around it.</p>
+
+  <section id="notice-prose">
+    <p class="eyebrow">08 — Library</p>
+    <h2>A school's own sentences in the privacy notice</h2>
+    <p class="lead">Parts of the privacy notice can only be written by the school: who the controller is, who the data protection officer is, how long answers are kept. Those sentences are assembled from the school's settings, and <b>how an unfinished one looks is a design decision, not a technical one</b>.</p>
+    <div class="demo col">
+      <div class="school-block-demo" style="border:1px dashed var(--outline);background:var(--surface-low);border-radius:var(--radius);padding:12px 14px;max-width:620px;">
+        <b style="display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">To be completed by your school</b>
+        <span style="font-size:14.5px">We keep your account for &lt;period&gt; after you stop using the platform.</span>
+      </div>
+      <p class="notice-prose">The data controller is Tehnička škola Zrenjanin, Đorđa Stratimirovića 23, 23000 Zrenjanin. Our data protection officer is Milena Ristić, dpo@skola.example.</p>
+    </div>
+    <p class="note"><b>The box appears only while the sentence still has a blank in it.</b> Once the school has filled it in, it is ordinary prose like every sentence around it.
+    <br><br>The label used to be unconditional, and it leaked a build-time affordance into what a fifteen-year-old reads: a notice visibly assembled from parts, with one part disowned by the people who sent it. A filled sentence is not "to be completed by your school" — it is the school talking. The treatment is kept for a sentence that genuinely is unfinished, because <b>a gap should look like a gap</b>; it is the administrator, not the student, who is shown the count and told the notice does not yet satisfy Article 13.
+    <br><br>Note the second sentence ends after the email address. A telephone is optional everywhere, and an optional field left blank must leave <em>no trace</em> — not a gap, and not a dangling comma before a full stop.</p>
+  </section>
+
+  <section id="states">
+    <p class="eyebrow">09 — Library</p>
+    <h2>Switched-off states</h2>
+    <p class="lead">Three different things get switched off, and they must not look alike. Through v1.0 the stylesheet had one rule for all of them — a blanket <code class="inline">opacity: .62</code> — which is why a withdrawn scenario read as broken and a dead button could only be identified by pressing it.</p>
+
+    <div class="state-defs">
+      <div>
+        <h4>Disabled</h4>
+        <p class="note">Cannot be used right now, and may become usable again. The affordance is removed on purpose, because acting on it is impossible — and it is removed by changing <em>material</em>, never by fading, so the state survives touch, daylight and greyscale.</p>
+        <p class="tokenline">--surface-container fill<br>--outline border<br>--text-muted label, full opacity<br>no elevation</p>
+      </div>
+      <div>
+        <h4>Read-only</h4>
+        <p class="note">Real, unchangeable, and worth copying — a scenario id, a submitted answer. This is not a softer disabled: the text keeps full contrast, and the field stays focusable and selectable.</p>
+        <p class="tokenline">--surface-low fill<br>--text label<br>cursor: text</p>
+      </div>
+      <div>
+        <h4>Retired / deactivated</h4>
+        <p class="note">Content a partner has withdrawn while student history still points at it. Out of circulation but still real: fully readable, fully clickable, so it must keep <em>looking</em> clickable. Reversible.</p>
+        <p class="tokenline">link stays --primary<br>supporting cells --text-muted<br>3px --outline-strong accent<br>no background tint</p>
+      </div>
+      <div>
+        <h4>Muted history</h4>
+        <p class="note">A record of something that happened — an abandoned session, a past attempt. Never styled as an error or a fault: it is data, not a problem.</p>
+        <p class="tokenline">--text-muted<br>neutral pill<br>no tint</p>
+      </div>
+    </div>
+
+    <h3 class="block">Disabled buttons</h3>
+    <div class="demo col">
+      <div class="ba-grid">
+        <div>
+          <h4>v1.0 — opacity .62</h4>
+          <p class="note">Still blue, still elevated, still shaped like the primary action. The one dependable tell was <code class="inline">cursor: not-allowed</code>, and a phone has no cursor.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <span class="button primary was-disabled">Send invitation</span>
+            <span class="button secondary was-disabled">Cancel</span>
+            <span class="button ghost was-disabled">Open</span>
+          </div>
+        </div>
+        <div>
+          <h4>v1.1 — flat, neutral, unelevated</h4>
+          <p class="note">The fill carries the state, so nothing has to be dimmed to say it and the label stays readable on a projector.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <span class="button primary disabled">Send invitation</span>
+            <span class="button secondary disabled">Cancel</span>
+            <span class="button ghost disabled">Open</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">All variants converge, deliberately. The ranking between primary, secondary and ghost is a ranking of the actions on offer; when none of them can be taken, the ranking has nothing left to say. Hover rules must be guarded with <code class="inline">:not(:disabled)</code> — unguarded, a disabled ghost still inverts to solid blue under the pointer and contradicts its own state.</p>
+
+    <h3 class="block">Disabled and read-only fields</h3>
+    <div class="demo">
+      <label class="field was">Name <span class="note" style="font-weight:400">(v1.0 disabled)</span>
+        <input value="Marija Popović" disabled>
+      </label>
+      <label class="field">Name <span class="note" style="font-weight:400">(v1.1 disabled)</span>
+        <input value="Marija Popović" disabled>
+      </label>
+      <label class="field">Scenario id <span class="note" style="font-weight:400">(read-only)</span>
+        <input value="construction-eqf3" readonly>
+      </label>
+    </div>
+    <p class="note">A disabled <code class="inline">select</code> also drops its chevron: a control that cannot open must not advertise that it opens. Note that <code class="inline">:read-only</code> matches disabled inputs too, so read-only rules need <code class="inline">:not(:disabled)</code> or they quietly undo the disabled fill.</p>
+
+    <h3 class="block">A level a student cannot start</h3>
+    <div class="demo">
+      <span class="lvl">III stepen<small>Započni</small></span>
+      <span class="lvl doing">IV stepen<small>U toku</small></span>
+      <span class="lvl done">III stepen<small>Završeno</small></span>
+      <span class="lvl spent">III stepen<small>Nema više pokušaja</small></span>
+    </div>
+    <p class="note">A fourth state beside <b>available</b>, <b>in progress</b> and <b>completed</b>: nothing left to start here. It is deliberately <em>not</em> green — <code class="inline">done</code> means the student finished it and is an achievement, while this is neither an achievement nor an error, so it goes dashed and quiet and out of the way. A level with history stays clickable even when spent, because that is where the student reviews what they already did; closing it would take something away rather than withhold something.</p>
+
+    <div class="demo col">
+      <p class="allowance-demo"><b>Preostalo intervjua ukupno: 6</b><span>Započeto intervjua: 9 od 15 · Intervju se računa od trenutka pokretanja, bez obzira na to da li je završen.</span></p>
+      <p class="allowance-demo spent"><b>Ukupan broj intervjua je iskorišćen: 15 od 15.</b><span>Otvoreni intervjui mogu i dalje da se završe — za više se obratite nastavniku.</span></p>
+      <div style="display:flex;gap:14px;align-items:center;margin-top:4px">
+        <span class="meta-left">Preostalo pokušaja: 2</span>
+        <span class="meta-left waiting">Ponovo dostupno: 16. septembar</span>
+        <span class="meta-left spent">Nema više pokušaja</span>
+      </div>
+    </div>
+    <p class="note">Said once above the catalogue, not on each of 213 rows. Quiet while there is room left and loud only once it is spent — a counter that shouts from the first interview teaches students to stop reading it. <b>Waiting is not the same as spent</b>: an interview in its cooldown comes back on its own, so the date is stated in brand blue rather than warned about in amber.</p>
+
+    <h3 class="block">Retired content row</h3>
+    <div class="demo col">
+      <table class="sessions">
+        <thead><tr><th>Scenario</th><th>Sector</th><th>Level</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><span class="linkish">Tehničar mehatronike</span><span class="row-sub">tehnicar-mehatronike-eqf4</span></td>
+              <td>Mehatronika i automatika</td><td>NOKS 4</td><td style="text-align:right"><span class="button ghost">Open</span></td></tr>
+          <tr class="is-retired"><td><span class="linkish">Construction — EQF 3</span><span class="pill pill-retired">Retired</span><span class="row-sub">construction-eqf3</span></td>
+              <td>Bâtiment</td><td>EQF 3</td><td style="text-align:right"><span class="button ghost">Open</span></td></tr>
+          <tr><td><span class="linkish">Bravar-zavarivač</span><span class="row-sub">bravar-zavarivac-eqf3</span></td>
+              <td>Mašinstvo</td><td>NOKS 3</td><td style="text-align:right"><span class="button ghost">Open</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The scenario name keeps its full <code class="inline">--primary</code>, because the row still opens and has to keep saying so. Only the supporting cells recede; a <strong>Retired</strong> pill states it in words; a 3px accent on the leading edge makes the row findable in a list of a hundred. <strong>No background tint</strong> — a tint reads as disabled, and this is the opposite of disabled. On phones, where rows collapse into cards, the accent moves to the card's left border.</p>
+
+    <div class="demo col">
+      <table class="sessions was">
+        <tbody>
+          <tr class="is-retired"><td><span class="linkish">Construction — EQF 3</span><span class="pill pill-retired">Retired</span><span class="row-sub">construction-eqf3</span></td>
+              <td>Bâtiment</td><td>EQF 3</td><td style="text-align:right"><span class="button ghost">Open</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The v1.0 treatment for comparison: everything muted over a tinted background. The scenario name was the same grey as the rest of the row, so the one interactive thing on it stopped looking interactive.</p>
+
+    <h3 class="block">Contrast of the new states</h3>
+    <table class="tokens">
+      <thead><tr><th>State</th><th>Foreground on background</th><th>Ratio</th><th>AA body</th></tr></thead>
+      <tbody>
+        <tr><td>Disabled control</td><td><code class="inline">#424654</code> on <code class="inline">#eaedff</code></td><td>8.08:1</td><td>Pass</td></tr>
+        <tr><td>Read-only field</td><td><code class="inline">#131b2e</code> on <code class="inline">#f2f3ff</code></td><td>15.56:1</td><td>Pass</td></tr>
+        <tr><td>Retired scenario name</td><td><code class="inline">#0040a1</code> on <code class="inline">#ffffff</code></td><td>9.34:1</td><td>Pass</td></tr>
+        <tr><td>Retired supporting cells</td><td><code class="inline">#424654</code> on <code class="inline">#ffffff</code></td><td>9.39:1</td><td>Pass</td></tr>
+        <tr><td>v1.0 disabled primary</td><td><code class="inline">#6189c5</code> on <code class="inline">#ffffff</code></td><td>3.56:1</td><td>Large text only</td></tr>
+        <tr><td>v1.0 retired row</td><td><code class="inline">#8a8c95</code> on <code class="inline">#ffffff</code></td><td>3.35:1</td><td>Large text only</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Disabled controls are formally exempt from the WCAG contrast minimum. We hold them to it anyway, because a teacher still has to read them on a classroom projector — and because once the flatness carries the state, there is nothing to gain by dimming the label as well.</p>
+  </section>
+
+  <!-- ================= SCREENS ================= -->
+  <section id="screens">
+    <p class="eyebrow">10 — Application</p>
+    <h2>Screens</h2>
+    <p class="lead">How the foundations and components come together in the real product — assembled entirely from the tokens and components defined above. The first group is what a <b>student and a teacher</b> move through. The second is <b>administration</b>: a school managing its own people and content, and the platform operator managing schools. Those two are deliberately not the same shape, and one of them is deliberately not in the reader's language.</p>
+
+    <!-- Login -->
+    <h3 class="block">Sign in</h3>
+    <div class="browser">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">app.riseproject.space/login</div></div>
+      <div class="canvas" style="display:grid;place-items:center;padding:56px 24px">
+        <div class="auth-panel" style="width:min(440px,100%);border:1px solid rgba(195,198,214,.78);border-radius:var(--radius-lg);background:rgba(255,255,255,.9);box-shadow:var(--shadow);padding:36px">
+          <svg style="width:104px;height:auto;display:block;margin-bottom:16px" viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE">
+            <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+            <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+            <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+            <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+            <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+          </svg>
+          <p style="color:var(--text-muted);font-size:14px;margin:0 0 22px;line-height:1.5">Job Interview AI Coach · AI kouč za razgovor za posao · Coach IA d'entretien · Coach de IA para entrevistas</p>
+          <label class="field" style="max-width:none;margin-bottom:16px">Email
+            <input type="email" value="marija@skola.edu.rs">
+          </label>
+          <label class="field" style="max-width:none;margin-bottom:20px">Password
+            <input type="password" value="password">
+          </label>
+          <span class="button primary" style="width:100%">Sign in</span>
+        </div>
+      </div>
+    </div>
+    <p class="screen-caption"><b>Sign in.</b> English-first because language is chosen after login; the four-language subtitle signals inclusivity from the first screen. Centered card on the tinted canvas, labeled inputs, full-width primary action.</p>
+
+    <!-- Student dashboard -->
+    <h3 class="block">Student dashboard — the catalogue</h3>
+    <div class="browser">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">app.riseproject.space/student</div></div>
+      <div class="canvas">
+        <div class="m-header">
+          <svg viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE">
+            <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+            <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+            <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+            <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+            <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+          </svg>
+          <div class="m-avatar">MP</div>
+        </div>
+
+        <h2 style="margin:14px 0 4px;font-size:20px">Dostupni intervjui</h2>
+        <p style="margin:0 0 14px;color:var(--text-muted);font-size:13.5px">Izaberite zanimanje, pa nivo koji odgovara vašem obrazovanju.</p>
+
+        <div style="background:var(--surface-low);border:1px solid var(--outline);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--primary)">Nastavite gde ste stali</span>
+            <span style="font-size:12px;color:var(--text-muted)">2 nezavršenih</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0">
+            <span><strong style="font-size:13.5px">Tehničar mehatronike</strong><br><span style="font-size:12px;color:var(--text-muted)">započeto pre 3 dana · pitanje 4 od 10</span></span>
+            <span class="button ghost">Nastavi</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;border-top:1px solid var(--outline)">
+            <span><strong style="font-size:13.5px">Bravar-zavarivač</strong><br><span style="font-size:12px;color:var(--text-muted)">započeto pre 21 dan · pitanje 2 od 10</span></span>
+            <span class="button ghost">Nastavi</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+          <span style="flex:1 1 200px;min-width:180px;background:var(--surface);border:1px solid var(--outline);border-radius:var(--radius);padding:7px 10px;font-size:13px;color:var(--text-muted)">Zanimanje ili oblast…</span>
+          <span style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--radius);padding:7px 10px;font-size:13px">Sve oblasti ▾</span>
+        </div>
+        <div class="chips" style="margin-bottom:10px">
+          <button class="active">Svi nivoi</button><button>III</button><button>IV</button><button>V</button>
+        </div>
+        <p style="margin:0 0 8px;font-size:12.5px;color:var(--text-muted)">9 zanimanja · 12 intervjua</p>
+
+        <table class="sessions">
+          <thead><tr><th>Zanimanje</th><th>Oblast</th><th>Nivo</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Tehničar mehatronike</strong><br><span style="font-size:12px;color:var(--text-muted)">2 pokušaja · najbolja 4,5</span></td>
+              <td><span class="pill" style="background:var(--surface-container);color:var(--text-muted)">Mašinstvo</span></td>
+              <td>IV</td>
+              <td style="text-align:right"><span class="button primary">Započnite 3. pokušaj</span></td>
+            </tr>
+            <tr>
+              <td><strong>Bravar-zavarivač</strong><br><span style="font-size:12px;color:var(--text-muted)">1 pokušaj · 3,7</span></td>
+              <td><span class="pill" style="background:var(--surface-container);color:var(--text-muted)">Mašinstvo</span></td>
+              <td>III</td>
+              <td style="text-align:right"><span class="button primary">Započnite 2. pokušaj</span></td>
+            </tr>
+            <tr>
+              <td><strong>Vozač motornih vozila</strong><br><span style="font-size:12px;color:var(--text-muted)">2 nivoa dostupno</span></td>
+              <td><span class="pill" style="background:var(--surface-container);color:var(--text-muted)">Saobraćaj</span></td>
+              <td>III · IV</td>
+              <td style="text-align:right"><span class="button primary">Započni</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="screen-caption"><b>Student dashboard.</b> <b>One row per occupation, not per scenario.</b> A catalogue can hold 224 interviews across 75 trades, and a student needs exactly one of them — so the row is the trade, and its qualification levels sit beside it rather than as separate entries competing for the same name. Search, sector and level narrow it; the count above the table says what the filters left, against the whole catalogue.</p>
+    <p class="screen-caption"><b>Resume comes first, above the catalogue</b>, because a student returning to an unfinished interview is the commonest reason this page is opened — and it names the question they stopped on rather than a percentage. An attempt left for two weeks or more is muted: still offered, no longer suggested.</p>
+    <p class="screen-caption">Attempts and best score sit under the occupation name, and the primary action counts up — <i>Započnite 3. pokušaj</i> — so a student can see they are repeating rather than starting. On phones each row becomes a card, with the column names carried by <code class="inline">data-label</code>. <span style="color:var(--text-muted)">This screen replaced a grid of scenario cards grouped under profession headings; that layout worked at 12 scenarios and stopped working at 224.</span></p>
+    <!-- Interview session -->
+    <h3 class="block">Interview session &amp; AI feedback</h3>
+    <div class="browser">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">app.riseproject.space/student/sessions/…</div></div>
+      <div class="canvas">
+        <div class="m-back"><span class="button ghost">← Nazad</span></div>
+        <h1 class="m-h1">Tehničko rešavanje problema</h1>
+        <div class="card-generic" style="margin-top:18px">
+          <h3 style="margin:0 0 4px">Pitanje 2 od 5</h3>
+          <p class="question-text">Opišite situaciju u kojoj ste rešili složen tehnički problem za klijenta. Kakav je bio ishod?</p>
+          <label class="field" style="max-width:none;margin-top:16px">Vaš odgovor
+            <textarea>Ostao sam smiren, izolovao kvar na napajanju i proveo klijenta kroz zamenu korak po korak…</textarea>
+          </label>
+          <div style="margin-top:14px"><span class="button primary">Pošalji odgovor</span></div>
+        </div>
+        <div class="feedback-card" style="margin-top:18px">
+          <h3>Povratna informacija</h3>
+          <span class="overall-score" style="margin-bottom:14px">Ukupno <strong>4.0 / 5</strong></span>
+          <ul class="criterion-list">
+            <li><strong>Komunikacija — 4.5 / 5</strong><p>Jasno i logično objašnjenje koje bi netehnički klijent mogao da prati.</p></li>
+            <li><strong>Rešavanje problema — 3.5 / 5</strong><p>Dobra dijagnoza; navedite uzrok eksplicitno i kvantifikujte rezultat.</p></li>
+          </ul>
+          <blockquote>"Poboljšan odgovor: … izolovao sam kvar na napajanju za 10 minuta i vratio liniju na pun kapacitet — smanjivši zastoj za oko pola."</blockquote>
+        </div>
+      </div>
+    </div>
+    <p class="screen-caption"><b>Interview session.</b> The platform drives the flow one question at a time. After each answer the AI feedback block appears — light-blue tint, brand accent bar, per-criterion rows, and an improved-answer example. This is where the design system does its most important work: making evaluative feedback feel supportive, not harsh.</p>
+
+    <!-- Teacher dashboard -->
+    <h3 class="block">Teacher dashboard</h3>
+    <div class="browser">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">app.riseproject.space/teacher</div></div>
+      <div class="canvas">
+        <div class="m-header">
+          <svg viewBox="0 0 250.59 150.46" xmlns="http://www.w3.org/2000/svg" aria-label="RISE">
+            <path fill="#1d1d1b" d="M78.14,75.89c2.09-3.23,3.13-7.2,3.13-11.91s-1.02-8.67-3.05-12.01c-2.03-3.34-4.88-5.9-8.54-7.67-3.66-1.78-7.93-2.66-12.81-2.66h-28.38v65.74h17.85v-21.7h6.18l11.54,21.7h19.39l-13.35-24.52c3.41-1.64,6.09-3.95,8.04-6.97ZM46.34,55.89h6.29c2.1,0,3.89.28,5.38.85,1.49.57,2.63,1.44,3.43,2.63.8,1.19,1.2,2.72,1.2,4.61s-.4,3.37-1.2,4.53c-.8,1.16-1.95,2-3.43,2.52-1.49.52-3.28.79-5.38.79h-6.29v-15.92Z"/>
+            <rect fill="#1d1d1b" x="88.84" y="41.64" width="17.85" height="65.74"/>
+            <path fill="#1d1d1b" d="M163.73,75.33c-1.65-1.7-3.77-3.18-6.36-4.45-2.59-1.26-5.7-2.28-9.34-3.05l-5.39-1.16c-1.56-.32-2.91-.68-4.04-1.09-1.13-.41-2.07-.86-2.79-1.36-.73-.5-1.26-1.07-1.59-1.7-.33-.63-.48-1.34-.43-2.13.02-.96.31-1.82.87-2.57.56-.75,1.42-1.34,2.58-1.78,1.17-.44,2.67-.66,4.51-.66,2.89,0,5.04.6,6.47,1.8,1.42,1.2,2.22,2.87,2.39,5.01h17.08c-.02-4.3-1.09-8.06-3.19-11.28-2.11-3.22-5.1-5.72-8.97-7.5-3.87-1.78-8.46-2.66-13.77-2.66s-9.81.88-13.82,2.63c-4.01,1.75-7.15,4.2-9.41,7.33-2.26,3.14-3.38,6.79-3.35,10.96-.02,5.14,1.64,9.19,4.99,12.15,3.35,2.96,7.93,5.08,13.75,6.34l6.55,1.41c2.44.53,4.38,1.11,5.81,1.72,1.43.61,2.47,1.29,3.1,2.05.63.76.96,1.64.98,2.65-.02,1.07-.36,2.02-1.03,2.86-.66.83-1.64,1.49-2.92,1.96-1.28.47-2.88.71-4.78.71-2.27,0-4.22-.35-5.86-1.06-1.64-.71-2.91-1.74-3.8-3.11-.9-1.37-1.4-3.06-1.51-5.07h-16.95c.02,5.5,1.2,10.01,3.55,13.53,2.34,3.52,5.64,6.13,9.89,7.82,4.25,1.69,9.23,2.54,14.94,2.54s10.33-.78,14.3-2.34c3.97-1.56,7.02-3.84,9.16-6.84,2.14-3,3.22-6.66,3.24-10.98-.02-2.5-.42-4.82-1.2-6.93-.78-2.12-2-4.03-3.64-5.73Z"/>
+            <polygon fill="#1d1d1b" points="175.38 107.38 222.63 107.38 222.63 93 193.23 93 193.23 81.7 220.32 81.7 220.32 67.32 193.23 67.32 193.23 56.02 222.76 56.02 222.76 41.64 175.38 41.64 175.38 107.38"/>
+            <path fill="#1d1d1b" d="M250.38,97.64l-9.84-75.96c-1.76-13.6-14.22-23.24-27.78-21.48L21.6,24.97c-6.56.85-12.4,4.22-16.45,9.49C1.11,39.72-.64,46.24.21,52.82l9.84,75.96c1.62,12.52,12.32,21.69,24.59,21.69,1.05,0,2.12-.07,3.19-.21l124.01-16.06,21,16.24,16.16-21.05,29.98-3.88c13.56-1.76,23.15-14.25,21.39-27.85ZM227.96,117.56l-33.28,4.31-13.3,17.32-17.27-13.36-127.31,16.49c-9.19,1.18-17.63-5.35-18.82-14.57L8.14,51.79c-.58-4.46.61-8.89,3.36-12.46,2.74-3.57,6.69-5.85,11.13-6.43L213.79,8.14c9.18-1.19,17.63,5.35,18.82,14.57l9.84,75.96c1.19,9.22-5.3,17.7-14.49,18.89Z"/>
+          </svg>
+          <div class="m-avatar">JT</div>
+        </div>
+        <div class="m-tabs"><span class="active">Intervjui učenika</span><span>Pregled sadržaja</span></div>
+        <h1 class="m-h1">Intervjui učenika</h1>
+        <p class="m-intro">Svi završeni i tekući intervjui. Najnoviji na vrhu.</p>
+
+        <div class="m-kpis">
+          <div class="m-kpi"><div class="lbl">Učenika sa intervjuom</div><div class="val">24</div><div class="sub">započelo bar jedan intervju</div></div>
+          <div class="m-kpi"><div class="lbl">Intervjua ove nedelje</div><div class="val">11</div><div class="sub">83 ukupno</div></div>
+          <div class="m-kpi"><div class="lbl">Prosečna ocena</div><div class="val">3,64</div><div class="sub">završeni intervjui, svi scenariji</div></div>
+          <div class="m-kpi is-alert"><div class="lbl">Traži pažnju</div><div class="val">5</div><div class="sub">nezavršeni ili ocena ispod 2,5</div></div>
+        </div>
+
+        <div class="m-panel">
+          <div class="m-filters">
+            <div class="m-combo">Student<span class="ctrl">Marija Petrović<span class="clear">×</span></span></div>
+            <div class="m-combo">Zanimanje<span class="ctrl" style="color:var(--outline-strong)">Sva zanimanja</span></div>
+            <label>Status<select><option>Svi statusi</option></select></label>
+            <label>Period<select><option>Sve vreme</option></select></label>
+          </div>
+
+          <div class="m-chips">
+            <span class="is-on">Svi</span><span>Traži pažnju</span><span>Prvi pokušaj</span><span>Ponovljeni pokušaj</span>
+          </div>
+          <p class="m-count">6 od ukupno 83 intervjua</p>
+
+          <div class="scroll-x">
+          <table class="sessions">
+            <thead><tr>
+              <th>Student <span class="sortmark">↕</span></th>
+              <th>Scenario <span class="sortmark">↕</span></th>
+              <th>Pokušaj <span class="sortmark">↕</span></th>
+              <th>Status <span class="sortmark">↕</span></th>
+              <th>Prosečna ocena <span class="sortmark">↕</span></th>
+              <th class="is-sorted">Počelo <span class="sortmark">↓</span></th>
+              <th></th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="linkish">Marija Petrović</span></td><td>Tehničar mehatronike</td><td>3</td>
+                <td><span class="pill status-completed">Završeno</span></td>
+                <td><span class="score is-high"><b>4,20</b><span class="score-track"><i style="width:84%"></i></span><span class="score-delta up">+0,45</span></span></td>
+                <td>26. avg</td><td style="text-align:right"><span class="button ghost">Pregledaj</span></td>
+              </tr>
+              <tr>
+                <td><span class="linkish">Nikola Simić</span></td><td>Bravar-zavarivač</td><td>1</td>
+                <td><span class="pill status-in_progress">U toku</span></td>
+                <td><span class="score-empty">—</span></td>
+                <td>26. avg</td><td style="text-align:right"><span class="button ghost">Pregledaj</span></td>
+              </tr>
+              <tr>
+                <td><span class="linkish">Ana Kovačević</span></td><td>Kuvar</td><td>2</td>
+                <td><span class="pill status-completed">Završeno</span></td>
+                <td><span class="score is-mid"><b>3,10</b><span class="score-track"><i style="width:62%"></i></span><span class="score-delta down">−0,30</span></span></td>
+                <td>25. avg</td><td style="text-align:right"><span class="button ghost">Pregledaj</span></td>
+              </tr>
+              <tr>
+                <td><span class="linkish">Stefan Jovanović</span></td><td>Tehničar mehatronike</td><td>1</td>
+                <td><span class="pill status-abandoned">Napušteno</span></td>
+                <td><span class="score is-low"><b>2,20</b><span class="score-track"><i style="width:44%"></i></span></span></td>
+                <td>24. avg</td><td style="text-align:right"><span class="button ghost">Pregledaj</span></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="screen-caption"><b>Teacher dashboard.</b> Four KPIs answer "is anything wrong?" before the teacher reads a single row — the last one turns amber only when it is non-zero, so an ordinary week shows no alarm colour at all. Below them, every column sorts, and the two high-cardinality filters (student, scenario) are type-ahead comboboxes rather than long <code class="inline">select</code> lists, because a large school has hundreds of each. Scores carry a coarse three-band colour and a bar for scanning a column at a glance, plus a delta against the previous attempt at the same scenario — the only comparison on this screen that is methodologically sound, since scores are not comparable between scenarios. The student's name opens their progress view; <b>Pregledaj</b> opens the session itself. On phones the table collapses into stacked cards.</p>
+
+    <!-- ============ ADMINISTRATION ============ -->
+    <h3 class="block">School administration — users</h3>
+    <div class="demo col">
+      <div class="tabs"><button class="active">Korisnici</button><button>Podešavanja</button></div>
+      <table class="sessions">
+        <thead><tr><th>Ime</th><th>E-pošta</th><th>Uloga</th><th>Jezik</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Jelena Marković</td><td>jelena.markovic@skola.example</td><td><span class="pill status-completed">Nastavnik</span></td><td>sr</td><td><span class="pill status-in_progress">Pozvan</span></td><td style="text-align:right"><span class="button ghost">···</span></td></tr>
+          <tr><td>Nikola Ilić</td><td>nikola.ilic@skola.example</td><td><span class="pill status-completed">Učenik</span></td><td>sr</td><td><span class="pill status-completed">Aktivan</span></td><td style="text-align:right"><span class="button ghost">···</span></td></tr>
+          <tr><td>Vesna Simić</td><td>vesna.simic@skola.example</td><td><span class="pill status-completed">Nastavnik</span></td><td>sr</td><td><span class="pill status-in_progress">Poziv istekao</span></td><td style="text-align:right"><span class="button ghost">···</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="screen-caption"><b>School administration.</b> One table holds accounts and unaccepted invitations together, because to the person reading it they are the same question — who is in my school, and who has not arrived yet. The status column carries that difference rather than a second table doing it. <b>This surface manages people and never shows their work:</b> a school administrator cannot open a transcript, and there is no endpoint that would return one. The interface is not hiding a capability; the capability does not exist. Everything here is in the school's own language, chosen when the organisation was created.</p>
+
+    <h3 class="block">Deleting a person — the only irreversible control</h3>
+    <div class="demo col" style="max-width:520px">
+      <div style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow)">
+        <h4 style="margin:0 0 10px">Obrisati Nikola Ilić i sve njihove podatke?</h4>
+        <p style="margin:0 0 8px;color:var(--text-muted)">Ovo trajno uklanja:</p>
+        <ul style="margin:0 0 14px 18px;padding:0">
+          <li>4 vežbi intervjua</li><li>38 odgovora i povratne informacije o njima</li><li>3 završnih izveštaja</li>
+        </ul>
+        <p style="margin:0 0 16px;font-size:13px;color:var(--text-muted)">Evidencija o tome ko je pristupao podacima ove osobe čuva se 12 meseci i ne briše se.</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <span class="button ghost">Zadrži nalog</span><span class="button" style="background:var(--error);color:#fff">Obriši trajno</span>
+        </div>
+      </div>
+    </div>
+    <p class="screen-caption"><b>The dialogue counts what it destroys.</b> &ldquo;Are you sure?&rdquo; invites a reflexive yes; <i>&ldquo;this removes 4 interviews and 38 answers&rdquo;</i> does not. The counts are real, fetched for this person at the moment of asking. Note what the dialogue does <b>not</b> contain: any of the content it is about to delete — an administrator can carry out an erasure without ever reading what is being erased. The keep option is worded as an action rather than as <i>Cancel</i>, so the safe choice reads as a choice.</p>
+
+    <h3 class="block">School administration — content</h3>
+    <div class="demo col" style="max-width:560px">
+      <div style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--radius-lg);padding:20px">
+        <h4 style="margin:0 0 6px">Sadržaj intervjua</h4>
+        <p style="margin:0 0 14px;color:var(--text-muted);font-size:14px">Intervjui vaše škole dolaze iz jedne Google tabele. Vidi je samo vaša škola.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="pill status-completed">povezano</span>
+          <span class="pill" style="background:var(--surface-container);color:var(--text-muted)">12 scenarija, 380 pitanja</span>
+        </div>
+        <div style="display:flex;gap:10px"><span class="button primary">Uvezi iz tabele</span><span class="button ghost">Otvori tabelu</span></div>
+        <p style="margin:12px 0 0;font-size:13px;color:var(--text-muted)">Izmena tabele ne menja ono što učenici vide. Uvezite je kada budete spremni.</p>
+      </div>
+    </div>
+    <p class="screen-caption"><b>The spreadsheet is an authoring surface, not a live source.</b> The sentence under the buttons is the whole design: editing the sheet changes nothing until someone imports it. That is what stops an accidental edit reaching a class mid-lesson, and it is why this panel needs an explicit action rather than quietly staying in sync. There is no field for a key — access is granted by sharing the sheet with the platform's service account, so what the administrator needs is an address to paste into Google's own dialogue, not somewhere to type a credential we would then hold.</p>
+
+    <h3 class="block">Import history</h3>
+    <div class="demo col">
+      <table class="sessions">
+        <thead><tr><th>Uvezeno</th><th>Scenariji</th><th>Pitanja</th><th>Ko</th><th>Intervjui</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>3.9.2026. 11:24 <span class="pill status-completed">u upotrebi</span></td><td>12</td><td>380</td><td>Zoran K.</td><td>7</td><td></td></tr>
+          <tr style="color:var(--text-muted)"><td>29.8.2026. 09:02</td><td>12</td><td>376</td><td>Zoran K.</td><td>4</td><td style="text-align:right"><span class="button ghost">Vrati u upotrebu</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="screen-caption"><b>Every import is kept, and this is where a mistake is undone.</b> Putting an earlier version back changes what students can <i>start</i>; it never changes what a finished interview shows, because each interview keeps the content it was taken on. The <b>Intervjui</b> column is the reason a version cannot simply be tidied away — it counts the interviews that still depend on it, and the database refuses to delete a version any of them point at.</p>
+
+    <h3 class="block">Platform administration — organisations</h3>
+    <div class="demo col">
+      <table class="sessions">
+        <thead><tr><th>Organisation</th><th>Country</th><th>Admins</th><th>Teachers</th><th>Students</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Tehnička škola Zrenjanin<br><span style="font-size:12px;color:var(--text-muted)">tehnicka-zrenjanin</span></td><td>Serbia</td><td>1</td><td>2</td><td>19</td><td><span class="pill status-completed">active</span></td></tr>
+          <tr><td>Lycée Jacques Le Caron<br><span style="font-size:12px;color:var(--text-muted)">lecaron</span></td><td>France</td><td><span class="pill status-in_progress">none</span></td><td>0</td><td>1</td><td><span class="pill status-completed">active</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="screen-caption"><b>Counts, never content.</b> This console provisions schools and invites their first administrator; it sits outside every school and cannot read a single student's answer. That is not a restriction the interface applies — no endpoint exists that would return one — and it is the claim the impact assessment rests on, so it holds only as long as none is added. <b>This is the one surface in the product that is English only</b>, deliberately: it belongs to the platform operator rather than to a school, is used by one person, and deals in slugs and organisation status rather than in anything a student or teacher reads. The amber <b>none</b> is doing real work — an organisation with no administrator can invite nobody and answer no erasure request.</p>
+
+    <h3 class="block">My account</h3>
+    <div class="demo col" style="max-width:520px">
+      <div style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--radius-lg);padding:20px">
+        <h4 style="margin:0 0 6px">Vaši podaci</h4>
+        <p style="margin:0 0 14px;color:var(--text-muted);font-size:14px">Kopiju svega što sistem čuva o vama možete preuzeti odmah. Brisanje traži škola, koja odgovara u roku od mesec dana.</p>
+        <div style="display:flex;gap:10px"><span class="button secondary">Preuzmi svoje podatke</span><span class="button ghost" style="color:var(--error);border-color:var(--error)">Tražim brisanje svojih podataka</span></div>
+        <p style="margin:12px 0 0;font-size:13px;color:var(--text-muted)">Preuzimanje počinje odmah i niko drugi ne mora da ga odobri.</p>
+      </div>
+    </div>
+    <p class="screen-caption"><b>Two buttons that look alike and are not.</b> The copy downloads immediately — nobody approves it, and no member of staff opens a transcript in order to hand it over. Deletion goes to the school, because that one genuinely is theirs to decide and to carry out, and it starts a one-month clock the law counts. The asymmetry is the design: a right you can exercise yourself should not be dressed as a request. The Serbian reads <i>Preuzmi <b>svoje</b> podatke</i>, not <i>moje</i> — the verb is second-person imperative, so the interface addresses the reader rather than speaking as them.</p>
+  </section>
+
+  <!-- ================= MOTION ================= -->
+  <section id="motion">
+    <p class="eyebrow">11 — Expression</p>
+    <h2>Motion — Skill Constellation</h2>
+    <p class="lead">While the AI evaluates an answer, RISE shows the <strong>Skill Constellation</strong>: a small network of nodes with energy pulsing along its edges and a traveling glow. It signals "your skills are connecting" — turning unavoidable model latency into a calm, on-brand moment instead of a spinner.</p>
+    <div class="demo" style="justify-content:center;padding:36px;background:var(--surface)">
+      <div class="skill-constellation active" aria-hidden="true">
+        <svg viewBox="0 0 220 64" width="264" height="76">
+          <defs>
+            <filter id="softGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <linearGradient id="energyGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7c9cff" stop-opacity="0"/><stop offset="50%" stop-color="#7c9cff" stop-opacity="1"/><stop offset="100%" stop-color="#7c9cff" stop-opacity="0"/></linearGradient>
+          </defs>
+          <g class="constellation-lines">
+            <line x1="24" y1="34" x2="68" y2="18"/><line x1="68" y1="18" x2="112" y2="34"/><line x1="112" y1="34" x2="156" y2="16"/><line x1="112" y1="34" x2="158" y2="50"/><line x1="158" y1="50" x2="198" y2="30"/><line x1="156" y1="16" x2="198" y2="30"/>
+          </g>
+          <g class="energy-lines">
+            <line x1="24" y1="34" x2="68" y2="18"/><line x1="68" y1="18" x2="112" y2="34"/><line x1="112" y1="34" x2="156" y2="16"/><line x1="112" y1="34" x2="158" y2="50"/><line x1="158" y1="50" x2="198" y2="30"/><line x1="156" y1="16" x2="198" y2="30"/>
+          </g>
+          <g class="constellation-nodes" filter="url(#softGlow)">
+            <circle cx="24" cy="34" r="5"/><circle cx="68" cy="18" r="5"/><circle cx="112" cy="34" r="6"/><circle cx="156" cy="16" r="5"/><circle cx="158" cy="50" r="5"/><circle cx="198" cy="30" r="6"/>
+          </g>
+          <circle class="traveler" r="4"/>
+        </svg>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:14px">
+      <div class="callout"><strong>Timing.</strong> Energy flows on a 1.8s loop, nodes pulse on 1.6s, and a glow travels the path on 2.4s — staggered so the network feels alive, not mechanical. UI transitions elsewhere are a quick 140ms ease.</div>
+      <div class="callout"><strong>Reduced motion.</strong> Under <code class="inline">prefers-reduced-motion</code> all animation stops and the constellation simply holds visible — respecting user and accessibility settings.</div>
+    </div>
+  </section>
+
+  <!-- ================= ACCESSIBILITY ================= -->
+  <section id="a11y">
+    <p class="eyebrow">12 — Quality</p>
+    <h2>Accessibility</h2>
+    <p class="lead">The pilot explicitly includes students with special educational needs, so accessibility is a first-class requirement, not a polish pass. The baseline below is already in the system; the Launch-Preparation phase extends it (see the platform PRD, §7.2).</p>
+    <div class="two-col">
+      <div class="card-generic">
+        <h3 class="block" style="margin-top:0">In the system today</h3>
+        <ul class="clean">
+          <li>Visible keyboard focus ring on every interactive element (2px <code class="inline">#0056D2</code>, 2px offset).</li>
+          <li>Labels always visible on inputs — never placeholder-only.</li>
+          <li>WCAG-AA text contrast across primary, body, and status colors.</li>
+          <li>Touch targets 44–48px for primary actions and the avatar control.</li>
+          <li><code class="inline">prefers-reduced-motion</code> honored for the constellation.</li>
+          <li>Fluid layouts down to 320px; no loss of function on small screens.</li>
+        </ul>
+      </div>
+      <div class="card-generic">
+        <h3 class="block" style="margin-top:0">Extended at Launch Prep</h3>
+        <ul class="clean">
+          <li>Localised login (falls back via browser language) so non-English readers can sign in.</li>
+          <li><code class="inline">aria-live</code> announcements when AI feedback arrives.</li>
+          <li>Accessibility panel: OpenDyslexic font, 100/125/150% text scaling, high-contrast theme, text-to-speech.</li>
+          <li>Automated <code class="inline">axe-core</code> checks wired into the build.</li>
+          <li>All touch targets raised to a 44px minimum.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESPONSIVE ================= -->
+  <section id="responsive">
+    <p class="eyebrow">13 — Quality</p>
+    <h2>Responsive Behaviour</h2>
+    <p class="lead">The layout is fluid from 320px up to the 1280px cap. Three breakpoints progressively simplify structure — reflowing card grids, stacking form controls, and collapsing data tables into cards.</p>
+    <div class="bp-row">
+      <div class="bp"><div class="w">≤ 860px</div><div class="n">Reduced page padding, smaller logo &amp; H1, tightened header.</div></div>
+      <div class="bp"><div class="w">≤ 640px</div><div class="n">Single-column card grids, full-width buttons, stacked filters, tables collapse to cards, language buttons stack.</div></div>
+      <div class="bp"><div class="w">≤ 390px</div><div class="n">Narrowest gutters, compact brand row, single-column invite form.</div></div>
+    </div>
+    <div class="callout" style="margin-top:18px"><strong>Mobile-first intent.</strong> On phones the answer screen keeps the Submit action reachable and session lists render as scannable cards rather than horizontally-scrolling tables — matching the platform PRD's mobile requirements (§7.6).</div>
+  </section>
+
+  <footer>
+    RISE — Visual Design Document · v1.3 · 2026-09-14 · Zoran Krnetić (PR BRIGHTNESS)
+  </footer>
+</div>
+</body>
+</html>

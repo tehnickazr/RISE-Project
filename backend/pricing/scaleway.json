@@ -1,0 +1,307 @@
+{
+  "version": "scaleway-2026-09-03",
+  "fetched_at": "2026-09-03T13:13:35.883Z",
+  "source": "https://api.scaleway.com/product-catalog/v2alpha1/public-catalog/products",
+  "currency": "EUR",
+  "note": "Retail list prices. Excludes free-tier allowance and any committed-use discount, so figures derived from this table are estimates, not billed amounts.",
+  "impact_note": "Environmental figures are Scaleway's own published estimates. A null means the catalog carries no figure for that model — it is not a measurement of zero. Scaleway currently publishes no water figure for audio models, and reports their CO2e as 0.",
+  "models": {
+    "glm-5.2": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 0.0000018,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 0.0000055,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "deepseek-v4-flash-0731": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 4.0000000000000003e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 8.000000000000001e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "qwen3.5-397b-a17b": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 6e-7,
+        "g_co2e_per_token": 8.1394796e-7,
+        "l_water_per_token": 7.75594e-10
+      },
+      "output": {
+        "eur_per_token": 0.0000036,
+        "g_co2e_per_token": 9.887912e-7,
+        "l_water_per_token": 1.2367193e-9
+      }
+    },
+    "qwen3.6-35b-a3b": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.5e-7,
+        "g_co2e_per_token": 7.967006e-7,
+        "l_water_per_token": 7.2914647e-10
+      },
+      "output": {
+        "eur_per_token": 0.0000015,
+        "g_co2e_per_token": 8.163179e-7,
+        "l_water_per_token": 7.722449e-10
+      }
+    },
+    "gemma-4-26b-a4b-it": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.5e-7,
+        "g_co2e_per_token": 7.977365e-7,
+        "l_water_per_token": 7.314223e-10
+      },
+      "output": {
+        "eur_per_token": 5e-7,
+        "g_co2e_per_token": 8.2667685e-7,
+        "l_water_per_token": 7.95003e-10
+      }
+    },
+    "mistral-medium-3.5-128b": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 0.0000015,
+        "g_co2e_per_token": 8.0594396e-7,
+        "l_water_per_token": 7.525384e-10
+      },
+      "output": {
+        "eur_per_token": 0.000007499999999999999,
+        "g_co2e_per_token": 9.08751e-7,
+        "l_water_per_token": 1.0061639e-9
+      }
+    },
+    "llama-3.3-70b-instruct": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "qwen3-235b-a22b-instruct-2507": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 7.5e-7,
+        "g_co2e_per_token": 8.0430635e-7,
+        "l_water_per_token": 7.484985e-10
+      },
+      "output": {
+        "eur_per_token": 0.0000022499999999999996,
+        "g_co2e_per_token": 8.9237534e-7,
+        "l_water_per_token": 9.657651e-10
+      }
+    },
+    "qwen3-coder-30b-a3b-instruct": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 6.686743e-7,
+        "l_water_per_token": 6.1047806e-10
+      },
+      "output": {
+        "eur_per_token": 8.000000000000001e-7,
+        "g_co2e_per_token": 6.843928e-7,
+        "l_water_per_token": 6.313222e-10
+      }
+    },
+    "pixtral-12b-2409": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 6.7132316e-7,
+        "l_water_per_token": 6.139907e-10
+      },
+      "output": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 7.108812e-7,
+        "l_water_per_token": 6.664485e-10
+      }
+    },
+    "mistral-small-3.2-24b-instruct-2506": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 1.5e-7,
+        "g_co2e_per_token": 7.9739505e-7,
+        "l_water_per_token": 7.306721e-10
+      },
+      "output": {
+        "eur_per_token": 3.5e-7,
+        "g_co2e_per_token": 8.2326204e-7,
+        "l_water_per_token": 7.875009e-10
+      }
+    },
+    "devstral-2-123b-instruct-2512": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 4.0000000000000003e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 0.000002,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "gpt-oss-120b": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 1.5e-7,
+        "g_co2e_per_token": 7.9744683e-7,
+        "l_water_per_token": 7.307859e-10
+      },
+      "output": {
+        "eur_per_token": 6e-7,
+        "g_co2e_per_token": 8.2377994e-7,
+        "l_water_per_token": 7.886386e-10
+      }
+    },
+    "gemma-3-27b-it": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.5e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 5e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "holo2-30b-a3b": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 3e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 7e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "mistral-small-3.1-24b-instruct-2503": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 1.5e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 3.5e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "qwen2.5-coder-32b-instruct": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "llama-3.1-70b-instruct": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "llama-3.1-8b-instruct": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "mistral-nemo-instruct-2407": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 2.0000000000000002e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "deepseek-r1-distill-llama-70b": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 9e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    },
+    "devstral-small-2505": {
+      "region": "fr-par",
+      "input": {
+        "eur_per_token": 1.5e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      },
+      "output": {
+        "eur_per_token": 3.5e-7,
+        "g_co2e_per_token": 0,
+        "l_water_per_token": 0
+      }
+    }
+  },
+  "audio": {
+    "whisper-large-v3": {
+      "region": "fr-par",
+      "eur_per_second": 0.00005,
+      "g_co2e_per_second": 0,
+      "l_water_per_second": null,
+      "supported_apis": [
+        "/v1/audio/transcriptions"
+      ]
+    }
+  }
+}

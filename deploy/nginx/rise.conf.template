@@ -1,0 +1,21 @@
+server {
+    server_name __DOMAIN__;
+
+    client_max_body_size 10m;
+
+    # Project documents, served directly by nginx from the deploy checkout
+    # (exact matches take priority over the SPA proxy below).
+    location = /prd          { default_type text/html; alias /opt/apps/rise/current/docs/prd/index.html; }
+    location = /design       { default_type text/html; alias /opt/apps/rise/current/docs/design/index.html; }
+    location = /architecture { default_type text/html; alias /opt/apps/rise/current/docs/architecture/index.html; }
+
+    location / {
+        proxy_pass http://127.0.0.1:3002;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

@@ -1,0 +1,18 @@
+node_modules/
+.env
+.DS_Store
+npm-debug.log*
+.tmp
+.claude/
+dist/
+
+# Google service account keys — NEVER commit
+*.serviceaccount.json
+rise-poc-*.json
+secrets/
+
+# env backups — never commit these
+.env.bak*
+.env.*.bak
+*.env.bak*
+__pycache__/

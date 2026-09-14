@@ -1,0 +1,159 @@
+.skill-constellation {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 64px;
+  opacity: 0;
+  transform: translate(-8px, -8px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.skill-constellation svg {
+  display: block;
+}
+
+.skill-constellation.active {
+  opacity: 1;
+  transform: translate(0, -8px) scale(1);
+}
+
+.constellation-lines line {
+  stroke: #c8d2f0;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.energy-lines line {
+  stroke: url(#energyGradient);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 18 80;
+  stroke-dashoffset: 100;
+  opacity: 0;
+}
+
+.skill-constellation.active .energy-lines line {
+  opacity: 1;
+  animation: energyFlow 1.8s ease-in-out infinite;
+}
+
+.energy-lines line:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.energy-lines line:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.energy-lines line:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.energy-lines line:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+.energy-lines line:nth-child(6) {
+  animation-delay: 0.75s;
+}
+
+.constellation-nodes circle {
+  fill: #6f8fe8;
+  opacity: 0.7;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.skill-constellation.active .constellation-nodes circle {
+  animation: nodePulse 1.6s ease-in-out infinite;
+}
+
+.constellation-nodes circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.constellation-nodes circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.constellation-nodes circle:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.constellation-nodes circle:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+.constellation-nodes circle:nth-child(6) {
+  animation-delay: 1s;
+}
+
+.traveler {
+  fill: #8fb3ff;
+  filter: url(#softGlow);
+  opacity: 0;
+}
+
+.skill-constellation.active .traveler {
+  opacity: 1;
+  animation: travelPath 2.4s ease-in-out infinite;
+}
+
+@keyframes energyFlow {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nodePulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes travelPath {
+  0% {
+    transform: translate(24px, 34px);
+  }
+  18% {
+    transform: translate(68px, 18px);
+  }
+  36% {
+    transform: translate(112px, 34px);
+  }
+  54% {
+    transform: translate(156px, 16px);
+  }
+  72% {
+    transform: translate(198px, 30px);
+  }
+  90% {
+    transform: translate(158px, 50px);
+  }
+  100% {
+    transform: translate(24px, 34px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-constellation.active .energy-lines line,
+  .skill-constellation.active .constellation-nodes circle,
+  .skill-constellation.active .traveler {
+    animation: none;
+  }
+
+  .skill-constellation.active {
+    opacity: 1;
+  }
+}
