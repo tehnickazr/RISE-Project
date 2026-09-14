@@ -46,8 +46,8 @@ LOG_DIR="/var/log/rise"
 DB_NAME="rise"
 DB_ROLE="rise"
 APP_PORT="3002"
-REPO="${RISE_REPO:-https://github.com/krneticz/RISE_POC.git}"
-BRANCH="${RISE_BRANCH:-production}"
+REPO="${RISE_REPO:-https://github.com/tehnickazr/RISE-Project.git}"
+BRANCH="${RISE_BRANCH:-main}"
 # Active LTS. Node 24 "Krypton" since October 2025; 26 is Current and does not
 # become LTS until October 2026. Verified against nodejs.org/dist/index.json
 # rather than remembered.
@@ -325,11 +325,17 @@ if [[ "$DATABASE_URL" == *"<set-this>"* ]]; then
   warn "Set one and put it in $ENV_FILE:"
   warn "  sudo -u postgres psql -c \"ALTER ROLE $DB_ROLE PASSWORD 'new-password'\""
   BUILD_OK=0
-elif sudo -u "$APP_USER" env DATABASE_URL="$DATABASE_URL" \
-       bash -c "cd '$APP_DIR/backend' && npm run migrate"; then
-  info "migrations applied"
+elif sudo -u "$APP_USER" env DATABASE_URL="$DATABASE_URL" bash -c "
+       set -e
+       cd '$APP_DIR/backend'
+       # schema.sql builds the database; migrations/ carries whatever has been
+       # added since it was frozen. Both, in that order — the second is a no-op
+       # until somebody adds the first migration, which is the point.
+       psql -v ON_ERROR_STOP=1 -q -d \"\$DATABASE_URL\" -f schema.sql
+       npm run migrate"; then
+  info "schema applied ($(grep -c '^CREATE TABLE' "$APP_DIR/backend/schema.sql") tables)"
 else
-  warn "migrations failed — the app will not serve until this is fixed"
+  warn "database build failed — the app will not serve until this is fixed"
   BUILD_OK=0
 fi
 
