@@ -597,8 +597,11 @@ cat <<EOF
        cd $APP_DIR/backend && sudo -u $APP_USER node --env-file=$ENV_FILE \\
          scripts/create-super-admin.mjs $ADMIN_EMAIL "Platform administrator"
 
- 5. Switch on weekly machine snapshots in your provider's panel. Nothing on
-    this host can do that, and they answer the failure the dump cannot.
+ 5. Confirm your provider's MACHINE backups are enabled, in their panel.
+    Usually on by default; check the retention while you are there. Nothing on
+    this host can do that, and they answer the failure the dump cannot: the
+    machine you restore onto. Note that a provider "snapshot" is a different
+    thing — manual, one at a time, and often deleted within a day.
 
  Deploys are manual on purpose:
        ssh $APP_USER@$DOMAIN 'bash $APP_DIR/deploy/deploy-production.sh'

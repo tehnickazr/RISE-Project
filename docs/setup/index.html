@@ -499,9 +499,23 @@ actually get the property — a delete leaves the real object underneath, recove
 
 <h3>Two more things</h3>
 
-<p><strong>Switch on weekly machine snapshots</strong> in your hosting provider's panel. Nothing
-running on the host can do this for itself, and it answers the failure a database dump cannot: the
-machine you restore <em>onto</em>.</p>
+<p><strong>Check your provider's machine backups are on</strong>, in their panel. Nothing running on
+the host can do this for itself, and it answers the failure a database dump cannot: the machine you
+restore <em>onto</em> — the OS, the packages, nginx, systemd, all of it. On most providers this is
+already enabled by default, so the job is usually to confirm it rather than switch it on, and to
+notice the retention. Hostinger, for example, keeps four images on a rolling basis, so the oldest
+machine you can go back to is a fortnight old.</p>
+
+<div class="note">
+  <span class="lbl">A snapshot is not a backup</span>
+  <p>Providers offer both and the words get used interchangeably. A <em>snapshot</em> is a manual
+  checkpoint you take by hand, usually limited to one at a time, and on some providers — Hostinger
+  among them — it is <strong>deleted automatically after a day</strong>.</p>
+  <p>That makes it the right tool immediately before a risky change: a major Node or PostgreSQL
+  upgrade, anything touching the whole machine. Take it, do the work, confirm the platform still
+  serves, and let it expire. What it must never be is the thing you are relying on the following
+  morning, because by then it is gone.</p>
+</div>
 
 <p><strong>Check tomorrow's backup, not today's.</strong> You just watched today's. The one worth
 verifying is the one that ran unattended while you were asleep, and the line to look for is
