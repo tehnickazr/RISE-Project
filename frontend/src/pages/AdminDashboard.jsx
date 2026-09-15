@@ -5,6 +5,7 @@ import { useT } from '../i18n/index.js';
 import logo from '../assets/images/Logo_Rise.svg';
 import UserMenu from '../components/UserMenu.jsx';
 import SettingsShell from '../components/SettingsShell.jsx';
+import Statistics from '../components/Statistics.jsx';
 import { LANGUAGES } from '../lib/orgFields.js';
 
 /**
@@ -21,11 +22,20 @@ const ACCOUNT_STATUS = {
   expired: (t) => t.admin.statusExpired,
 };
 
+/**
+ * What a request *is*, not what you can do to it.
+ *
+ * These pointed at the button labels, so the status column read "Mark
+ * answered" and "Refuse" — and `cancelled` showed `t.admin.cancel`, which is
+ * the dismiss button of a modal: in Serbian the status of a cancelled request
+ * was the words "Not now". A status is a noun in every language the platform
+ * speaks.
+ */
 const REQUEST_STATUS = {
   pending: (t) => t.admin.statusPending,
-  completed: (t) => t.admin.markAnswered,
-  refused: (t) => t.admin.refuse,
-  cancelled: (t) => t.admin.cancel,
+  completed: (t) => t.admin.statusAnswered,
+  refused: (t) => t.admin.statusRefused,
+  cancelled: (t) => t.admin.statusCancelled,
 };
 
 function formatDate(ts) {
@@ -264,6 +274,15 @@ export default function AdminDashboard() {
           {t.admin.tabUsers}
         </button>
         <button
+          className={activeTab === 'statistics' ? 'active' : ''}
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'statistics'}
+          onClick={() => setActiveTab('statistics')}
+        >
+          {t.admin.tabStatistics}
+        </button>
+        <button
           className={activeTab === 'settings' ? 'active' : ''}
           type="button"
           role="tab"
@@ -438,6 +457,14 @@ export default function AdminDashboard() {
               </table>
             </>
           )}
+        </section>
+      )}
+
+      {activeTab === 'statistics' && (
+        <section className="admin-panel">
+          {/* Scoped to this school by the server, from the actor. There is no
+              parameter here that could widen it. */}
+          <Statistics scope="organization" />
         </section>
       )}
 

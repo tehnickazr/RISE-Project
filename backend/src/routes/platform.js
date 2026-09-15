@@ -17,6 +17,7 @@ import { isSupportedLanguage, supportedLanguageMessage } from '../i18n/languages
 import { platformLimits } from '../db/limits.js';
 import { PlatformLimitsSchema } from '../sessions/limits.js';
 import { PlatformSupportSchema } from '../settings/school.js';
+import { statisticsRouter } from './statistics.js';
 
 export const platformRouter = express.Router();
 
@@ -265,3 +266,13 @@ platformRouter.put('/support', async (req, res) => {
   );
   res.json({ platform: rows[0] });
 });
+
+// ---------------------------------------------------------------------------
+// Statistics
+// ---------------------------------------------------------------------------
+//
+// null scope: every school. Mounted last so that the aggregate endpoints sit
+// visibly inside the router whose header explains why nothing here may return
+// student data.
+
+platformRouter.use('/statistics', statisticsRouter(() => null));

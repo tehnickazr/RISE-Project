@@ -116,8 +116,7 @@ export const notice = {
       heading: '8. Empresas que ajudam a fazer funcionar o serviço',
       table: [
         ['Scaleway', 'Faz funcionar o modelo de IA que lê e classifica as suas respostas, e converte voz em texto caso opte por ditar — Paris, França (UE)'],
-        ['Hostinger', 'Faz funcionar os servidores que armazenam os dados — Frankfurt, Alemanha (UE)'],
-        ['Resend', 'Envia as mensagens de correio eletrónico relativas à conta'],
+        ['Hostinger', 'Faz funcionar os servidores que armazenam os dados e envia as mensagens de correio eletrónico relativas à conta — Frankfurt, Alemanha (UE)'],
       ],
       after: [
         'As suas respostas são tratadas **dentro da União Europeia**. O modelo de IA funciona em Paris e a base de dados está em Frankfurt.',

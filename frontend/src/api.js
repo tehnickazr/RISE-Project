@@ -28,6 +28,16 @@ async function request(path, options = {}) {
   return data;
 }
 
+/** A period as query parameters. Custom carries its two dates; the rest do not. */
+function periodQuery(period) {
+  const q = new URLSearchParams({ period: period.key });
+  if (period.key === 'custom') {
+    q.set('from', period.from);
+    q.set('to', period.to);
+  }
+  return q.toString();
+}
+
 export const api = {
   login: (email, password) =>
     request('/api/login', {
@@ -131,6 +141,15 @@ export const api = {
   supportSettings: () => request('/api/admin/support-settings'),
   setSupportSettings: (payload) =>
     request('/api/admin/support-settings', { method: 'PUT', body: JSON.stringify(payload) }),
+  // Statistics. The same shape for both scopes — the server decides which from
+  // the actor, so there is no scope parameter to get wrong here.
+  statistics: (scope, period) =>
+    request(`/api/${scope === 'platform' ? 'platform' : 'admin'}/statistics?${periodQuery(period)}`),
+  // The export is a zip, so it bypasses `request()` — which parses JSON — and
+  // hands the browser a blob to save.
+  statisticsExportUrl: (scope, period) =>
+    `/api/${scope === 'platform' ? 'platform' : 'admin'}/statistics/export.zip?${periodQuery(period)}`,
+
   platformSupport: () => request('/api/platform/support'),
   setPlatformSupport: (payload) =>
     request('/api/platform/support', { method: 'PUT', body: JSON.stringify(payload) }),

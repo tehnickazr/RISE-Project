@@ -6,6 +6,7 @@ import logo from '../assets/images/Logo_Rise.svg';
 import UserMenu from '../components/UserMenu.jsx';
 import { COUNTRIES, LANGUAGES, countryName, slugify } from '../lib/orgFields.js';
 import SessionLimitsSettings from '../components/SessionLimitsSettings.jsx';
+import Statistics from '../components/Statistics.jsx';
 
 /**
  * The platform console.
@@ -21,6 +22,7 @@ export default function PlatformDashboard() {
   const [orgs, setOrgs] = useState(null);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState('orgs');
   const [orgForm, setOrgForm] = useState({ name: '', slug: '', country: 'RS', default_language: 'sr' });
   // The slug follows the name until it is edited by hand, then it stops --
   // otherwise typing a deliberate slug and then correcting a typo in the name
@@ -134,193 +136,241 @@ export default function PlatformDashboard() {
         <UserMenu user={user} logout={logout} label={t.common.signOut} accountLabel={t.account.menuLink} />
       </header>
 
-      <h1>Organisations</h1>
-      <p className="page-intro">
-        Platform administration. This console shows how many people are in each organisation and
-        how it is configured — never what anyone wrote.
-      </p>
+      {/* Three sections rather than one long scroll. The console had grown to
+          five panels of unrelated things: a table you read, a form you fill in
+          once, and settings you touch twice a year. */}
+      <nav className="tabs" aria-label="Sections">
+        {[
+          ['orgs', 'Organisations'],
+          ['settings', 'Settings'],
+          ['stats', 'Statistics'],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            className={tab === key ? 'active' : ''}
+            aria-current={tab === key ? 'page' : undefined}
+            onClick={() => setTab(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+
+
 
       {error && <p className="error">{error}</p>}
       {message && <p className="success-message">{message}</p>}
       {!orgs && !error && <p>{t.common.loading}</p>}
 
-      {orgs && (
-        <section className="panel">
-          <table className="sessions-table">
-            <thead>
-              <tr>
-                <th>Organisation</th>
-                <th>Country</th>
-                <th>Admins</th>
-                <th>Teachers</th>
-                <th>Students</th>
-                <th>Groups</th>
-                <th>Status</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {orgs.map((o) => (
-                <tr key={o.id} className={o.status === 'active' ? undefined : 'muted-row'}>
-                  <td data-label="Organisation">
-                    {o.name}
-                    <span className="row-sub">{o.slug}</span>
-                  </td>
-                  <td data-label="Country">{countryName(o.country)}</td>
-                  {/* An organisation with no administrator can invite nobody
-                      and answer no erasure request. Flagged rather than left
-                      to be noticed. */}
-                  <td data-label="Admins">
-                    {o.admins === 0 ? <span className="pill-pending">none</span> : o.admins}
-                  </td>
-                  <td data-label="Teachers">{o.teachers}</td>
-                  <td data-label="Students">{o.students}</td>
-                  <td data-label="Groups">{o.groups}</td>
-                  <td data-label="Status">
-                    <span className={o.status === 'active' ? 'role-pill' : 'pill-pending'}>{o.status}</span>
-                  </td>
-                  <td className="table-action">
-                    <div className="request-actions">
-                      <button type="button" className="button secondary" onClick={() => openInvite(o)}>
-                        Invite admin
-                      </button>
-                      {o.status === 'active' ? (
-                        <button type="button" className="button ghost danger" onClick={() => onStatus(o, 'suspended')}>
-                          Suspend
-                        </button>
-                      ) : (
-                        <button type="button" className="button ghost" onClick={() => onStatus(o, 'active')}>
-                          Reactivate
-                        </button>
-                      )}
-                    </div>
-                  </td>
+
+      {tab === 'orgs' && (
+        <>
+        <h1>Organisations</h1>
+        <p className="page-intro">
+          Every school on the platform. This console shows how many people are in each organisation
+          and how it is configured — never what anyone wrote.
+        </p>
+        {orgs && (
+          <section className="panel">
+            <table className="sessions-table">
+              <thead>
+                <tr>
+                  <th>Organisation</th>
+                  <th>Country</th>
+                  <th>Admins</th>
+                  <th>Teachers</th>
+                  <th>Students</th>
+                  <th>Groups</th>
+                  <th>Status</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {orgs.map((o) => (
+                  <tr key={o.id} className={o.status === 'active' ? undefined : 'muted-row'}>
+                    <td data-label="Organisation">
+                      {o.name}
+                      <span className="row-sub">{o.slug}</span>
+                    </td>
+                    <td data-label="Country">{countryName(o.country)}</td>
+                    {/* An organisation with no administrator can invite nobody
+                        and answer no erasure request. Flagged rather than left
+                        to be noticed. */}
+                    <td data-label="Admins">
+                      {o.admins === 0 ? <span className="pill-pending">none</span> : o.admins}
+                    </td>
+                    <td data-label="Teachers">{o.teachers}</td>
+                    <td data-label="Students">{o.students}</td>
+                    <td data-label="Groups">{o.groups}</td>
+                    <td data-label="Status">
+                      <span className={o.status === 'active' ? 'role-pill' : 'pill-pending'}>{o.status}</span>
+                    </td>
+                    <td className="table-action">
+                      <div className="request-actions">
+                        <button type="button" className="button secondary" onClick={() => openInvite(o)}>
+                          Invite admin
+                        </button>
+                        {o.status === 'active' ? (
+                          <button type="button" className="button ghost danger" onClick={() => onStatus(o, 'suspended')}>
+                            Suspend
+                          </button>
+                        ) : (
+                          <button type="button" className="button ghost" onClick={() => onStatus(o, 'active')}>
+                            Reactivate
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+
+        <section className="panel">
+          <h2>New organisation</h2>
+          <form className="invite-form" onSubmit={onCreateOrg}>
+            <label>
+              Name
+              <input
+                value={orgForm.name}
+                required
+                minLength={2}
+                placeholder="Tehnička škola Zrenjanin"
+                onChange={(e) => {
+                  const name = e.target.value;
+                  setOrgForm((f) => ({
+                    ...f,
+                    name,
+                    slug: slugTouched ? f.slug : slugify(name),
+                  }));
+                }}
+              />
+            </label>
+            <label>
+              Short name (slug)
+              <input
+                value={orgForm.slug}
+                required
+                pattern="[a-z0-9-]{2,60}"
+                placeholder="lowercase-with-hyphens"
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setOrgForm((f) => ({ ...f, slug: e.target.value }));
+                }}
+              />
+            </label>
+            <label>
+              Country
+              <select
+                value={orgForm.country}
+                onChange={(e) => setOrgForm((f) => ({ ...f, country: e.target.value }))}
+              >
+                {COUNTRIES.map(([code, name]) => (
+                  <option key={code} value={code}>{name}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Default language
+              <select
+                value={orgForm.default_language}
+                onChange={(e) => setOrgForm((f) => ({ ...f, default_language: e.target.value }))}
+              >
+                {LANGUAGES.map(([code, name]) => (
+                  <option key={code} value={code}>{name}</option>
+                ))}
+              </select>
+            </label>
+            <button className="button primary" type="submit" disabled={busy}>
+              {busy ? 'Working…' : 'Create'}
+            </button>
+          </form>
+          {/* The default language is what an invitation from this organisation
+              arrives in, so it is a choice about the people rather than about
+              the record. */}
+          <p className="field-hint">
+            The short name appears in links and is suggested from the name — edit it if the school
+            goes by something shorter. The default language is the one invitations are sent in.
+          </p>
         </section>
+        </>
       )}
 
-      <section className="panel">
-        <h2>New organisation</h2>
-        <form className="invite-form" onSubmit={onCreateOrg}>
-          <label>
-            Name
-            <input
-              value={orgForm.name}
-              required
-              minLength={2}
-              placeholder="Tehnička škola Zrenjanin"
-              onChange={(e) => {
-                const name = e.target.value;
-                setOrgForm((f) => ({
-                  ...f,
-                  name,
-                  slug: slugTouched ? f.slug : slugify(name),
-                }));
-              }}
-            />
-          </label>
-          <label>
-            Short name (slug)
-            <input
-              value={orgForm.slug}
-              required
-              pattern="[a-z0-9-]{2,60}"
-              placeholder="lowercase-with-hyphens"
-              onChange={(e) => {
-                setSlugTouched(true);
-                setOrgForm((f) => ({ ...f, slug: e.target.value }));
-              }}
-            />
-          </label>
-          <label>
-            Country
-            <select
-              value={orgForm.country}
-              onChange={(e) => setOrgForm((f) => ({ ...f, country: e.target.value }))}
-            >
-              {COUNTRIES.map(([code, name]) => (
-                <option key={code} value={code}>{name}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Default language
-            <select
-              value={orgForm.default_language}
-              onChange={(e) => setOrgForm((f) => ({ ...f, default_language: e.target.value }))}
-            >
-              {LANGUAGES.map(([code, name]) => (
-                <option key={code} value={code}>{name}</option>
-              ))}
-            </select>
-          </label>
-          <button className="button primary" type="submit" disabled={busy}>
-            {busy ? 'Working…' : 'Create'}
+      {tab === 'settings' && (
+        <>
+        <h1>Settings</h1>
+        <p className="page-intro">
+          Platform-wide defaults and the people who administer them. A school can tighten any limit
+          for its own students; none of them can loosen it.
+        </p>
+        {/* The numbers every school starts from. A school that sets its own keeps
+            it; changing this reaches every school that has not. */}
+        <SessionLimitsSettings scope="platform" />
+
+        {/* One address, answered by one team, shown inside every school. A school
+            cannot edit it, for the same reason it cannot edit the limits above:
+            changing it would change who answers for everybody else's students. */}
+        <section className="panel">
+          <h2>Platform support contact</h2>
+          <p className="section-intro">
+            Shown to every student and teacher, on every school's help sheet, for faults in the
+            platform itself. Leave it blank and students see only their own school's contact.
+          </p>
+          <form className="settings-form" onSubmit={onSaveSupport}>
+            <label>
+              <span>Name</span>
+              <input
+                value={supportForm.support_name}
+                placeholder="RISE platform support"
+                onChange={(e) => setSupportForm((f) => ({ ...f, support_name: e.target.value }))}
+              />
+            </label>
+            <label>
+              <span>Email</span>
+              <input
+                type="email"
+                value={supportForm.support_email}
+                placeholder="support@example.org"
+                onChange={(e) => setSupportForm((f) => ({ ...f, support_email: e.target.value }))}
+              />
+              <span className="sub">
+                This has to be a mailbox that receives. Students write to it.
+              </span>
+            </label>
+            <button className="button primary" type="submit" disabled={busy}>
+              {busy ? 'Saving…' : 'Save'}
+            </button>
+            {supportSaved && <p className="success-message">Saved.</p>}
+          </form>
+        </section>
+
+        <section className="panel">
+          <h2>Platform administrators</h2>
+          <p className="panel-hint">
+            A super administrator provisions organisations and invites their first administrator.
+            They belong to no organisation and cannot read student data.
+          </p>
+          <button type="button" className="button secondary" onClick={() => openInvite('super')}>
+            Invite a super administrator
           </button>
-        </form>
-        {/* The default language is what an invitation from this organisation
-            arrives in, so it is a choice about the people rather than about
-            the record. */}
-        <p className="field-hint">
-          The short name appears in links and is suggested from the name — edit it if the school
-          goes by something shorter. The default language is the one invitations are sent in.
-        </p>
-      </section>
+        </section>
+        </>
+      )}
 
-      {/* The numbers every school starts from. A school that sets its own keeps
-          it; changing this reaches every school that has not. */}
-      <SessionLimitsSettings scope="platform" />
-
-      {/* One address, answered by one team, shown inside every school. A school
-          cannot edit it, for the same reason it cannot edit the limits above:
-          changing it would change who answers for everybody else's students. */}
-      <section className="panel">
-        <h2>Platform support contact</h2>
-        <p className="section-intro">
-          Shown to every student and teacher, on every school's help sheet, for faults in the
-          platform itself. Leave it blank and students see only their own school's contact.
+      {tab === 'stats' && (
+        <>
+        <h1>Statistics</h1>
+        <p className="page-intro">
+          Everything the platform can count, across every school. Aggregates only: there is no
+          endpoint here that would return one student's work, and none should be added.
         </p>
-        <form className="settings-form" onSubmit={onSaveSupport}>
-          <label>
-            <span>Name</span>
-            <input
-              value={supportForm.support_name}
-              placeholder="RISE platform support"
-              onChange={(e) => setSupportForm((f) => ({ ...f, support_name: e.target.value }))}
-            />
-          </label>
-          <label>
-            <span>Email</span>
-            <input
-              type="email"
-              value={supportForm.support_email}
-              placeholder="support@example.org"
-              onChange={(e) => setSupportForm((f) => ({ ...f, support_email: e.target.value }))}
-            />
-            <span className="sub">
-              This has to be a mailbox that receives. Students write to it.
-            </span>
-          </label>
-          <button className="button primary" type="submit" disabled={busy}>
-            {busy ? 'Saving…' : 'Save'}
-          </button>
-          {supportSaved && <p className="success-message">Saved.</p>}
-        </form>
-      </section>
+        <Statistics scope="platform" />
+        </>
+      )}
 
-      <section className="panel">
-        <h2>Platform administrators</h2>
-        <p className="panel-hint">
-          A super administrator provisions organisations and invites their first administrator.
-          They belong to no organisation and cannot read student data.
-        </p>
-        <button type="button" className="button secondary" onClick={() => openInvite('super')}>
-          Invite a super administrator
-        </button>
-      </section>
 
       {inviteFor && (
         <div

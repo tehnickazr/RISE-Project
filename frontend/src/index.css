@@ -87,7 +87,7 @@ select:disabled,
 textarea:disabled,
 input:disabled {
   cursor: not-allowed;
-  background: var(--surface-container);
+  background-color: var(--surface-container);
   border-color: var(--outline);
   color: var(--text-muted);
   box-shadow: none;
@@ -346,7 +346,7 @@ button {
 .sessions-table button:disabled,
 .attempt-list button.link:disabled,
 .chips button:disabled {
-  background: var(--surface-container);
+  background-color: var(--surface-container);
   border-color: var(--outline);
   color: var(--text-muted);
   box-shadow: none;
@@ -411,7 +411,9 @@ button {
   min-height: 44px;
   border: 1px solid var(--outline);
   border-radius: var(--radius);
-  background: var(--surface);
+  /* Longhand, not `background`. The shorthand resets background-image, which
+     is where the select chevron lives — see the rule below. */
+  background-color: var(--surface);
   color: var(--text);
   padding: 10px 12px;
   font-size: 16px;
@@ -420,10 +422,20 @@ button {
 
 /* Native select arrows sit hard against the right edge and differ per platform,
    so the chevron is drawn as a background image and the right padding is opened
-   up to make room for it. `appearance: none` is what lets the padding apply. */
-.filters select,
-.invite-form select,
-.account-form select {
+   up to make room for it. `appearance: none` is what lets the padding apply.
+ *
+ * Element-level, deliberately. This used to be a hand-kept list of contexts —
+ * `.filters`, `.invite-form`, `.account-form` — and every form added since was
+ * forgotten: the settings forms and the statistics period picker both shipped
+ * with the arrow jammed against the border. A list of selectors that has to be
+ * extended by hand is a list that will not be.
+ *
+ * It only works because the rules above set `background-color` rather than the
+ * `background` shorthand, which would reset this image. Keep it that way.
+ *
+ * Multiple and sized selects are excluded: they render as a list box with no
+ * arrow at all, and the padding would only indent their options. */
+select:not([multiple]):not([size]) {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 40px;
@@ -499,7 +511,7 @@ button {
 .error {
   border: 1px solid rgba(186, 26, 26, 0.28);
   border-radius: var(--radius);
-  background: var(--error-soft);
+  background-color: var(--error-soft);
   color: #93000a;
   font-size: 14px;
   font-weight: 600;
@@ -765,7 +777,7 @@ button {
 .answer-submit-row .dictate.stop {
   border-color: rgba(186, 26, 26, 0.4);
   color: #93000a;
-  background: var(--error-soft);
+  background-color: var(--error-soft);
 }
 
 .dictate-pulse {
@@ -1032,9 +1044,15 @@ button {
   margin-top: 4px;
 }
 
+/* "Saved." sits *below* the button now — it was moved there so that showing it
+   could not push the button out from under a second click — but the spacing
+   was never updated to match, so it had a bottom margin and nothing above it
+   and ended up welded to the button it was confirming. Four forms show it that
+   way: limits, privacy notice, support contacts, and the platform console. */
 .success-message {
   color: var(--success);
   font-weight: 700;
+  margin-top: 12px;
   margin-bottom: 16px;
 }
 
@@ -2334,7 +2352,7 @@ button {
 }
 
 .anchor.is-missing {
-  background: var(--error-soft);
+  background-color: var(--error-soft);
   border-left-color: var(--error);
 }
 
@@ -3352,7 +3370,7 @@ button {
    and pin the hover state to the same colours so there is nothing left to win. */
 .answer-form .answer-submit-row .dictate.stop,
 .answer-form .answer-submit-row .dictate.stop:hover:not(:disabled) {
-  background: var(--error-soft);
+  background-color: var(--error-soft);
   border-color: rgba(186, 26, 26, 0.4);
   color: #93000a;
   box-shadow: none;
@@ -3590,7 +3608,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   width: 100%;
   min-height: 40px;
   padding: 9px 12px;
@@ -3614,20 +3633,37 @@ button {
   color: var(--primary);
 }
 
-/* The status pip. Red by default because the state it usually reports is an
-   unfinished legal document; green only once there is nothing left to report. */
+/* The status pip.
+ *
+ * `white-space: nowrap` because these strings are translated, and the
+ * translations are longer than the English they were sized against: "not set"
+ * is "nije postavljeno" in Serbian, which broke across two lines mid-phrase
+ * and left the rail button ragged. It now wraps as a whole pip onto its own
+ * line instead, which is what the button's flex-wrap is for.
+ *
+ * Three levels. Red is reserved for the privacy notice, which is a legal
+ * document with gaps in it. A support contact that has not been set is a
+ * to-do — students see the platform's own address meanwhile — and giving it
+ * the same red taught people to read past both. */
 .settings-rail .pip {
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 999px;
-  background: var(--error-soft);
+  background-color: var(--error-soft);
   color: #93000a;
   font-size: 11px;
   font-weight: 800;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .settings-rail .pip.ok {
   background: var(--success-soft);
   color: var(--success);
+}
+
+.settings-rail .pip.todo {
+  background: var(--surface-container);
+  color: var(--text-muted);
 }
 
 .settings-body { min-width: 0; }
@@ -3636,7 +3672,30 @@ button {
 
 .settings-form .limit-field { max-width: none; }
 
+/* Stacked fields, with rhythm between them.
+ *
+ * `settings-form` styled the *input* and said nothing about the label around
+ * it, so every field in these forms was a browser-default inline label pressed
+ * against its control — three pixels, visible everywhere, and worst on the
+ * privacy form where eight fields run together.
+ *
+ * `.limit-choice` is excluded because it is genuinely horizontal: a radio, its
+ * wording, and sometimes a number box, all on one line. */
+.settings-form label:not(.limit-choice) {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
 .settings-form label > span:first-child { font-weight: 650; }
+
+/* A block hint introduces what follows it — a set of fields, or the button that
+   saves them — and needs room underneath. Only the paragraph form: the same
+   class is used inline inside labels, where a bottom margin would be wrong. */
+p.field-hint {
+  margin-bottom: 14px;
+}
 
 .settings-form label em {
   font-style: normal;
@@ -3652,12 +3711,22 @@ button {
   padding: 10px 12px;
   border: 1px solid var(--outline);
   border-radius: var(--radius);
-  background: var(--surface);
+  background-color: var(--surface);
   color: var(--text);
   font-size: 16px;
 }
 
 .settings-form textarea { min-height: 76px; line-height: 1.45; }
+
+/* A select and a date input each size themselves from their own internals — the
+   select from its line box once `appearance: none` removes the native control,
+   the date input from the picker it carries — and both land a few pixels off a
+   plain text input beside them. Two pixels and four respectively, which is
+   invisible in a column and obvious in a row. Pin both. */
+.settings-form select,
+.settings-form input[type='date'] {
+  height: 44px;
+}
 
 .settings-form input:focus,
 .settings-form textarea:focus,
@@ -3671,7 +3740,7 @@ button {
    nothing here refuses to save — so it is marked rather than rejected. */
 .settings-form .is-gap {
   border-color: var(--error);
-  background: #fff7f6;
+  background-color: #fff7f6;
 }
 
 .period-row {
@@ -3702,7 +3771,7 @@ button {
 
 .gap-banner.is-student {
   border-left-color: var(--error);
-  background: var(--error-soft);
+  background-color: var(--error-soft);
 }
 
 .gap-banner.is-student strong { color: #93000a; }
@@ -3767,4 +3836,264 @@ button {
    in PrivacyNotice.jsx. */
 .notice-school {
   margin: 0 0 14px;
+}
+
+/* ---------------------------------------------------------------------------
+   Statistics
+   ---------------------------------------------------------------------------
+   Aggregates only. Nothing on these pages drills down to a person, so there are
+   no row actions and nothing is clickable except the period and the export. */
+
+/* The period row: one filter, on one line, with the export at the far end.
+   The custom dates join the same row rather than opening a panel below it. */
+.stats-periodrow {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+/* Two classes, deliberately: `.settings-form label:not(.limit-choice)` is also
+   two, and a single-class opt-out silently lost to it — leaving the 18px bottom
+   margin in place. `align-items: flex-end` aligns *margin* boxes, so the labels
+   ended 18px below their own inputs and the Apply button, which has no margin,
+   dropped to meet them. */
+.stats-periodrow.settings-form label {
+  flex: 0 1 auto;
+  min-width: 150px;
+  /* The stacking comes from `.settings-form label`; this row only opts out of
+     the vertical rhythm, because it runs across rather than down. */
+  margin-bottom: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.stats-period-picker {
+  min-width: 190px;
+}
+/* A date input sizes itself to its own text and ignores width:100% in some
+   browsers unless it is told it may shrink. */
+.stats-periodrow input[type='date'],
+.stats-periodrow select {
+  min-width: 0;
+  width: 100%;
+}
+/* The export is an action, not a field, so it sits away from the filter. */
+.stats-download {
+  margin-left: auto;
+}
+@media (max-width: 720px) {
+  .stats-download {
+    margin-left: 0;
+  }
+}
+.stats-period-label {
+  margin: 4px 0 22px;
+}
+.stats-footnote {
+  margin-top: 28px;
+  max-width: 82ch;
+}
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.stat-cards.compact {
+  margin-bottom: 0;
+}
+.stat-card {
+  border: 1px solid rgba(195, 198, 214, 0.72);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.stat-card-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* A change, coloured by its sign. Never assume improvement: on real data two
+   competencies fell while three rose, and painting every delta green would
+   have hidden exactly the two worth talking about. */
+.delta {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.delta.up {
+  color: var(--success);
+}
+.delta.down {
+  color: var(--error);
+}
+.delta.flat {
+  color: var(--outline-strong);
+}
+
+.stat-bar {
+  display: grid;
+  grid-template-columns: 150px 1fr 64px;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.stat-bar-label {
+  color: var(--text-muted);
+}
+.stat-bar-track {
+  background: var(--surface-container);
+  border-radius: 999px;
+  height: 18px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  display: block;
+  background: var(--primary);
+  height: 100%;
+  border-radius: 999px;
+}
+.stat-bar-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* Every bar carries its own number, all bars are one colour, and a bar is
+   capped in width so four buckets do not stretch into four billboards. */
+.stat-trend {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 10px 0 2px;
+}
+.stat-trend-col {
+  flex: 1 1 0;
+  max-width: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-trend-value {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.stat-trend-plot {
+  display: flex;
+  align-items: flex-end;
+  height: 104px;
+}
+.stat-trend-bar {
+  width: 100%;
+  background: var(--primary);
+  border-radius: 4px 4px 0 0;
+}
+/* Nothing is nothing. A zero bar draws no ink; the track it sits in is not
+   filled either, so the column reads as empty at a glance. */
+.stat-trend-bar.empty {
+  background: none;
+}
+.stat-trend-label {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.competency-row {
+  display: grid;
+  grid-template-columns: 190px 1fr 172px;
+  gap: 12px;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.competency-name {
+  color: var(--text);
+}
+.competency-bars {
+  display: grid;
+  gap: 4px;
+}
+.competency-track {
+  background: var(--surface-container);
+  border-radius: 999px;
+  height: 13px;
+  overflow: hidden;
+}
+.competency-before {
+  display: block;
+  background: var(--outline-strong);
+  height: 100%;
+}
+.competency-after {
+  display: block;
+  background: var(--success);
+  height: 100%;
+}
+.competency-after.down {
+  background: var(--error);
+}
+.competency-figures {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.competency-row.suppressed-row {
+  grid-template-columns: 190px 1fr;
+}
+
+.suppressed {
+  color: var(--outline-strong);
+  font-style: italic;
+  font-size: 13.5px;
+}
+
+/* The caveat that has to survive being skimmed. */
+.warning-note {
+  border-left: 3px solid var(--warning);
+  background: var(--warning-soft);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--warning);
+  max-width: 88ch;
+}
+
+@media (max-width: 720px) {
+  .competency-row,
+  .competency-row.suppressed-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .competency-figures {
+    text-align: left;
+  }
+  .stat-bar {
+    grid-template-columns: 110px 1fr 54px;
+  }
 }

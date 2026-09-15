@@ -1,6 +1,7 @@
 import express from 'express';
 import { z } from 'zod';
 import { requireRole, withActor } from '../auth/middleware.js';
+import { statisticsRouter } from './statistics.js';
 import { pool } from '../db/pool.js';
 import { issueInvitation } from '../invitations/issue.js';
 import { isSupportedLanguage, supportedLanguageMessage } from '../i18n/languages.js';
@@ -647,3 +648,12 @@ adminRouter.put('/support-settings', async (req, res) => {
   );
   res.json({ settings: saved.settings, platform: rows[0] ?? null });
 });
+
+// ---------------------------------------------------------------------------
+// Statistics
+// ---------------------------------------------------------------------------
+//
+// Scoped to the administrator's own school, read from the actor rather than
+// from the request. There is no parameter that would widen it.
+
+adminRouter.use('/statistics', statisticsRouter((req) => req.actor.org_id));

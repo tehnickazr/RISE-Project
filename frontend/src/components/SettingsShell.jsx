@@ -42,14 +42,22 @@ export default function SettingsShell() {
 
   useEffect(loadStatus, []);
 
+  /**
+   * Three levels, not two.
+   *
+   * An unfinished privacy notice is a legal document with holes in it and
+   * stays red. A missing support contact is a to-do: students fall back to
+   * the platform's own address, nothing is broken, and painting it the same
+   * red taught readers to ignore both.
+   */
   const pipFor = (id) => {
     if (id === 'privacy' && gaps !== null) {
       return gaps === 0
-        ? { text: t.settings.complete, ok: true }
-        : { text: t.settings.empty(gaps), ok: false };
+        ? { text: t.settings.complete, level: 'ok' }
+        : { text: t.settings.empty(gaps), level: 'bad' };
     }
     if (id === 'support' && supportSet !== null && !supportSet) {
-      return { text: t.settings.notSet, ok: false };
+      return { text: t.settings.notSet, level: 'todo' };
     }
     return null;
   };
@@ -70,7 +78,7 @@ export default function SettingsShell() {
               onClick={() => setActive(s.id)}
             >
               <span>{s.label(t)}</span>
-              {pip && <span className={`pip${pip.ok ? ' ok' : ''}`}>{pip.text}</span>}
+              {pip && <span className={`pip ${pip.level}`}>{pip.text}</span>}
             </button>
           );
         })}

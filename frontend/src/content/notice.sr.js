@@ -105,8 +105,7 @@ export const notice = {
       heading: '8. Kompanije koje nam pomažu',
       table: [
         ['Scaleway', 'Pokreće model veštačke inteligencije koji čita i ocenjuje odgovore, a pretvara i govor u tekst ako izaberete diktiranje — Pariz, Francuska (EU)'],
-        ['Hostinger', 'Održava servere na kojima se čuvaju podaci — Frankfurt, Nemačka (EU)'],
-        ['Resend', 'Šalje mejlove o nalogu'],
+        ['Hostinger', 'Održava servere na kojima se čuvaju podaci i šalje mejlove o nalogu — Frankfurt, Nemačka (EU)'],
       ],
       after: [
         'Vaši odgovori se obrađuju **unutar Evropske unije**. Model radi u Parizu, a baza podataka je u Frankfurtu.',

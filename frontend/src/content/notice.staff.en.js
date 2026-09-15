@@ -118,8 +118,7 @@ export const notice = {
       id: 'helpers',
       heading: '6. Where your data is held',
       table: [
-        ['Hostinger', 'Servers and database — Frankfurt, Germany (EU)'],
-        ['Resend', 'Account and invitation emails'],
+        ['Hostinger', 'Servers, database, and account and invitation email — Frankfurt, Germany (EU)'],
         ['Scaleway', 'The AI model — Paris, France (EU). It never receives your data, only student answers.'],
       ],
     },

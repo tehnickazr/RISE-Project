@@ -45,7 +45,17 @@
 // than shipping visible — see ./fill-notice.js.
 //
 // This bump stops everyone at the notice on their next visit. See below.
-export const NOTICE_VERSION = '1.2';
+// 1.3 — Resend removed from the sub-processor table. It was never used: mail
+// goes through the school's own mailbox, which is Hostinger's, so the row
+// named a company that holds none of this data. Folded into Hostinger's entry
+// rather than deleted, or the notice would say nothing about who handles a
+// student's email address.
+//
+// NOTICE_REQUIRES_ACK is deliberately NOT moved. Naming one fewer company, and
+// naming the right one, does not put a reader at any disadvantage — there is
+// nothing here for anyone to reconsider, and stopping forty-two people to tell
+// them so would teach them that these prompts are noise.
+export const NOTICE_VERSION = '1.3';
 
 /**
  * The most recent version whose change was *material* — the newest text a

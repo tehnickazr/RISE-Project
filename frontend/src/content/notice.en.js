@@ -105,8 +105,7 @@ export const notice = {
       heading: '8. Companies that help run the service',
       table: [
         ['Scaleway', 'Runs the AI model that reads and scores your answers, and turns speech into text if you choose to dictate — Paris, France (EU)'],
-        ['Hostinger', 'Runs the servers that store the data — Frankfurt, Germany (EU)'],
-        ['Resend', 'Sends account emails'],
+        ['Hostinger', 'Runs the servers that store the data, and sends account emails — Frankfurt, Germany (EU)'],
       ],
       after: [
         'Your answers are processed **inside the European Union**. The AI model runs in Paris and the database is in Frankfurt.',
