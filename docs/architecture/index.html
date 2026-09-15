@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RISE — Architecture &amp; Infrastructure v2.1</title>
+<title>RISE — Architecture &amp; Infrastructure v2.2</title>
 <style>
 :root{
   --background:#faf8ff;--surface:#ffffff;--surface-low:#f2f3ff;--surface-container:#eaedff;--surface-high:#e2e7ff;
@@ -136,7 +136,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
       <div><dt>Product</dt><dd>RISE — AI Interview Coach</dd></div>
       <div><dt>Document</dt><dd>Architecture &amp; Infrastructure</dd></div>
       <div><dt>Version</dt><dd>2.1</dd></div>
-      <div><dt>Date</dt><dd>2026-09-14 <span style="color:var(--text-muted)">(v2.0: 2026-09-03 · v1.0: 2026-07-07)</span></dd></div>
+      <div><dt>Date</dt><dd>2026-09-15 <span style="color:var(--text-muted)">(v2.1: 2026-09-14 · v2.0: 2026-09-03 · v1.0: 2026-07-07)</span></dd></div>
       <div><dt>Author</dt><dd>Zoran Krnetić (PR BRIGHTNESS)</dd></div>
     </dl>
   </div>
@@ -149,6 +149,13 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
     <p class="note" style="margin-bottom:18px">The platform's guiding principle is a small, low-cost, provider-agnostic footprint that protects student data by default and can grow — from a single server, to a school's own network, to the cloud — without being rebuilt.</p>
 
     <div class="card" style="border-left:4px solid var(--primary);margin:20px 0;">
+      <p style="margin:0 0 10px;"><b>v2.2 — 15 September 2026.</b> One new layer, and two sentences that had stopped being true:</p>
+      <ul class="clean" style="margin:0 0 16px;">
+        <li><b>Statistics.</b> A fourth layer beside the routers, the services and the queries: the rules that decide what a period means and when a cohort is too small live in a module that touches nothing, so they are testable as functions. One router mounts twice and takes its scope from the actor, never the request.</li>
+        <li><b>Aggregates are now an explicit exception</b> to "nobody but the student and their teachers", stated beside the access model rather than left to be inferred — bounded by queries that only ever return groups, and by a five-student reporting threshold.</li>
+        <li><b>Production no longer sends through Resend.</b> Mail goes through the school's own mailbox, which receives as well as sends; the second transport is kept for a school with no mail server of its own. The document said the opposite.</li>
+        <li><b>Routers are no longer five.</b> They were counted before two were added.</li>
+      </ul>
       <p style="margin:0 0 10px;"><b>v2.1 — 14 September 2026.</b> Four tables the document had never named, and one sentence that had become untrue:</p>
       <ul class="clean" style="margin:0 0 16px;">
         <li><b>The data model was four tables short</b> — <code class="inline">password_resets</code>, <code class="inline">platform_settings</code>, <code class="inline">org_settings</code> and <code class="inline">transcription_calls</code>. The last had been missing since voice input shipped.</li>
@@ -363,9 +370,10 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
       <div class="card">
         <h3>Backend</h3>
         <ul class="clean">
-          <li>Five routers mount under <code class="inline">/api</code>; a <code class="inline">/health</code> endpoint supports uptime checks.</li>
+          <li>Routers mount under <code class="inline">/api</code>, one per audience — auth, student, teacher, school administrator, platform administrator — plus a <code class="inline">/health</code> endpoint for uptime checks.</li>
           <li>Business logic lives in service modules (LLM, Sheets, email, auth, DB) — routers stay thin.</li>
           <li>The interview state machine (next question, scoring, summary) lives server-side; the AI never drives flow.</li>
+          <li><b>Statistics are a fourth layer, deliberately separated.</b> <code class="inline">stats/rules.js</code> holds the decisions and touches nothing — which window a period means, what it compares against, when a cohort is too small to publish — so they are testable as functions rather than as fragments of a query. <code class="inline">db/stats.js</code> is only SQL. <code class="inline">stats/report.js</code> runs them together. One router mounts twice, at <code class="inline">/api/platform/statistics</code> and <code class="inline">/api/admin/statistics</code>, and takes its scope from the actor rather than the request.</li>
         </ul>
       </div>
     </div>
@@ -530,7 +538,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
         <ul class="clean">
           <li>Sends transactional invitation and password-reset mail with a hashed, single-use token link.</li>
           <li><b>Two transports, and <code class="inline">MAIL_TRANSPORT</code> chooses.</b> A host may legitimately carry the configuration for both, so the choice is declared rather than inferred from which variables happen to be set — inference is how a host ends up sending through the transport nobody meant to use, with two plausible explanations and only one of them looked at.</li>
-          <li>Production is deliberately on Resend until the project owns a mailbox that can receive; the SMTP path is configured and unused.</li>
+          <li><b>SMTP, through the school&rsquo;s own mailbox.</b> That address both sends and receives, which is what an invitation telling a fifteen-year-old to click a link needs: somewhere the reply goes to a person. Resend remains supported and unused &mdash; kept as the second option for a school with no mail server of its own, not as the default. The privacy notice names only the providers that actually hold data, so it no longer lists a mail service at all: the mailbox belongs to the same provider as the servers.</li>
         </ul>
       </div>
       <div class="card">
@@ -574,6 +582,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
     <h3 class="block">Who can read a student's answers</h3>
     <p>The shortest true statement of the access model, and the one the impact assessment rests on: <b>that student, and teachers at that student's own school.</b> Nobody else.</p>
     <p>A school administrator manages accounts and carries out erasures — the deletion dialogue counts what it destroys and shows none of it — and a platform administrator manages organisations. Neither can open a transcript or export one, and <b>no endpoint exists that would return either</b>. That is what makes the claim durable rather than a matter of interface design: it holds exactly as long as no such endpoint is added.</p>
+    <p><b>Aggregates are the exception, and are bounded on purpose.</b> The statistics pages give both kinds of administrator counts, sums and means over groups — never a row about a person, and never a link from a figure to the student behind it. Two things keep that from eroding. Every query in <code class="inline">db/stats.js</code> returns a group, so there is no endpoint to misuse; and any cohort below five students is withheld rather than averaged, because an average over two students read by their own teacher is not anonymous. Withheld rows are returned with a reason rather than dropped, so a suppressed group cannot be mistaken for an empty one.</p>
     <div class="callout"><strong>Application-level enforcement, for now.</strong> The organisation predicate lives in one module rather than being repeated in each route, because the characteristic failure of shared-schema tenancy is the query that forgot its <code class="inline">WHERE</code> — and here what leaks is interview transcripts written by minors. Row-level security is the intended backstop and is <b>not yet in place</b>; it needs a transaction or a dedicated client per request, and was deliberately separated from the scoping change so that a regression in either would be attributable. See §14.</div>
   </section>
 

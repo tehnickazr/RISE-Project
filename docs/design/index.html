@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RISE — Visual Design Document v1.3</title>
+<title>RISE — Visual Design Document v1.4</title>
 <style>
 /* ============================================================
    RISE — Visual Design Document
@@ -225,7 +225,7 @@ table.sessions.was tr.is-retired .linkish{color:var(--text-muted);}
 .field{display:flex;flex-direction:column;gap:7px;color:var(--text-muted);font-size:14px;font-weight:650;max-width:340px;width:100%;}
 .field input,.field select,.field textarea{
   width:100%;min-height:44px;border:1px solid var(--outline);border-radius:var(--radius);
-  background:var(--surface);color:var(--text);padding:10px 12px;font:inherit;font-size:16px;font-weight:400;
+  background-color:var(--surface);color:var(--text);padding:10px 12px;font:inherit;font-size:16px;font-weight:400;
   transition:border-color 140ms ease,box-shadow 140ms ease;
 }
 .field textarea{min-height:96px;resize:vertical;}
@@ -435,7 +435,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
 .num-input.gap{border-color:var(--error);background:#fff7f6;}
 .period-demo{display:grid;grid-template-columns:108px 1fr;gap:10px;max-width:320px;}
 .period-demo select{min-height:44px;padding:10px 12px;border:1px solid var(--outline);
-  border-radius:var(--radius);background:var(--surface);font:inherit;font-size:16px;}
+  border-radius:var(--radius);background-color:var(--surface);font:inherit;font-size:16px;}
 
 .limit-demo{border:1px solid var(--outline);border-radius:var(--radius);padding:12px 16px 14px;max-width:460px;}
 .limit-demo legend{font-weight:700;font-size:15px;padding:0 6px;}
@@ -501,6 +501,41 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
 .meta-left.spent{color:var(--warning);}
 .meta-left.waiting{color:var(--primary);font-weight:600;}
 .notice-prose{max-width:620px;font-size:14.5px;}
+
+/* ---- statistics, added with the page ---- */
+select:not([multiple]):not([size]){appearance:none;-webkit-appearance:none;
+  padding-right:40px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23424654' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:12px 8px;}
+.sel-demo{min-height:44px;padding:10px 40px 10px 12px;
+  border:1px solid var(--outline);border-radius:var(--radius);background-color:var(--surface);
+  color:var(--text);font:inherit;font-size:16px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23424654' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:12px 8px;}
+.stat-card-demo{border:1px solid rgba(195,198,214,.72);border-radius:var(--radius-lg);
+  background:var(--surface);box-shadow:var(--shadow);padding:16px 18px;min-width:168px;
+  display:flex;flex-direction:column;gap:2px;}
+.stat-card-demo .k{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--text-muted);}
+.stat-card-demo .v{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15;font-variant-numeric:tabular-nums;}
+.stat-card-demo .s{font-size:13px;color:var(--text-muted);}
+.delta-demo{font-weight:700;font-variant-numeric:tabular-nums;}
+.delta-demo.up{color:var(--success);} .delta-demo.down{color:var(--error);}
+.delta-demo.flat{color:var(--outline-strong);}
+.comp-demo{display:grid;grid-template-columns:150px 1fr 150px;gap:12px;align-items:center;width:100%;font-size:14px;}
+.comp-demo .track{display:block;background:var(--surface-container);border-radius:999px;height:13px;overflow:hidden;}
+.comp-demo .track + .track{margin-top:4px;}
+.comp-demo .before{display:block;background:var(--outline-strong);height:100%;}
+.comp-demo .after{display:block;background:var(--success);height:100%;}
+.comp-demo .after.down{background:var(--error);}
+.comp-demo .fig{text-align:right;color:var(--text-muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.trend-demo{display:flex;align-items:flex-end;gap:10px;}
+.trend-demo .col{display:flex;flex-direction:column;gap:4px;width:64px;}
+.trend-demo .v{text-align:center;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+.trend-demo .plot{display:flex;align-items:flex-end;height:80px;}
+.trend-demo .bar{width:100%;background:var(--primary);border-radius:4px 4px 0 0;}
+.trend-demo .bar.empty{background:none;}
+.trend-demo .lab{text-align:center;font-size:11px;color:var(--text-muted);}
+.suppressed-demo{color:var(--outline-strong);font-style:italic;font-size:13.5px;}
 </style>
 </head>
 <body>
@@ -550,10 +585,21 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
       <div><dt>Product</dt><dd>RISE — AI Interview Coach</dd></div>
       <div><dt>Document</dt><dd>Visual Design / Design System</dd></div>
       <div><dt>Version</dt><dd>1.3</dd></div>
-      <div><dt>Date</dt><dd>2026-09-14</dd></div>
+      <div><dt>Date</dt><dd>2026-09-15</dd></div>
       <div><dt>Author</dt><dd>Zoran Krnetić (PR BRIGHTNESS)</dd></div>
     </dl>
     <p class="note" style="margin-top:20px;max-width:70ch">
+      <strong>v1.4 — 2026-09-15.</strong> The statistics pages, and the same mistake as last time.
+      Adds the <a href="#components">select field</a>, the <a href="#components">statistics
+      figures</a>, a <b>change coloured by its sign</b>, the <b>first-against-most-recent
+      comparison</b> with its withheld row, and the <b>trend</b>. The select is v1.3's number-input
+      lesson repeated exactly: the chevron was a hand-kept list of contexts, every form added since
+      was left out of it, and three of them shipped with the raw native arrow. It is one
+      element-level rule now — which was only possible once the rules styling a select stopped using
+      the <code class="inline">background</code> shorthand that resets the image. Also records that a
+      filter is a select and never a second row of tabs, and that a status is a noun: the
+      data-request column was filled from the action buttons, so a cancelled request read "Not now".
+      <br><br>
       <strong>v1.3 — 2026-09-14.</strong> Settings grew from one panel to four, which needed a
       navigation and a way for a section to report its own state while closed: adds the
       <a href="#components">settings rail and its status pip</a>, the
@@ -795,6 +841,71 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
     <p class="note"><b>Everything but the width comes from the shared field treatment</b> — same 44px height, same 8px radius, same 1px outline, same 16px type, same focus ring. That is the whole rule: a number box is a field, and it is listed in the same selectors as every other field rather than given a parallel set of its own. A second definition of "what an input looks like" is a second thing to keep in step, and when it drifted the box came out square-cornered and 22px tall beside the fields around it.
     <br><br>It holds at most three digits and usually sits inline beside a label or a radio, so it is fixed at <b>84px</b> instead of filling its container — full width would make a two-digit number look like a text field. <code class="inline">tabular-nums</code> keeps the digits from shifting as the value changes. Disabled is the ordinary disabled field: <code class="inline">--surface-container</code> fill, muted label, no fade. The fourth is a field whose blank would be visible to a reader — see the gap banner below.</p>
 
+    <h3 class="block">Select field</h3>
+    <div class="demo">
+      <label class="field">Period
+        <select class="sel-demo"><option>All time</option></select>
+      </label>
+      <label class="field">Legal basis for students
+        <select class="sel-demo"><option>Public task</option></select>
+      </label>
+    </div>
+    <p class="note"><b>The chevron is drawn, not native.</b> A platform select arrow sits hard against the right edge and looks different on every operating system, so <code class="inline">appearance: none</code> removes it, 40px of right padding opens the room, and the chevron goes in as a background image.
+    <br><br>This is the same rule the number input states, broken a second time and in the same way: the treatment was written as a hand-kept <i>list of contexts</i>, and every form added afterwards was left out of the list. Two settings forms and the statistics period picker all shipped with the raw native arrow jammed into the border. It is now <b>one element-level rule</b> for every select in the product.
+    <br><br>It could only become element-level once every rule that styles a select used <code class="inline">background-color</code> rather than the <code class="inline">background</code> shorthand — the shorthand silently resets <code class="inline">background-image</code>, which is where the chevron lives. <b>Do not reach for the shorthand on a field.</b> That single character is what forced the per-context duplication in the first place.
+    <br><br>A select and a date input each size themselves from their own internals, two and four pixels off a text input respectively. Invisible in a column, obvious in a row, so both are pinned to 44px.</p>
+
+    <h3 class="block">Statistics figures</h3>
+    <div class="demo">
+      <div class="stat-card-demo"><span class="k">Interviews completed</span><span class="v">642</span><span class="s">+27% against the previous period</span></div>
+      <div class="stat-card-demo"><span class="k">First interview</span><span class="v">2,84</span><span class="s">mean overall score, out of 5</span></div>
+      <div class="stat-card-demo"><span class="k">Most recent</span><span class="v">3,61</span><span class="s"><span class="delta-demo up">+0,77</span> improvement</span></div>
+    </div>
+    <p class="note">One card, one number, one line of context under it. Values are <code class="inline">tabular-nums</code> so a figure does not jitter when the period changes, and every number goes through <code class="inline">Intl</code> with the reader's locale — which is how all three partner countries get the comma decimal they write, rather than an English number with translated words around it.</p>
+
+    <h3 class="block">A change, coloured by its sign</h3>
+    <div class="demo">
+      <span class="delta-demo up">+0,92</span>
+      <span class="delta-demo down">−0,29</span>
+      <span class="delta-demo flat">±0,00</span>
+    </div>
+    <p class="note"><b>Never assume improvement.</b> The first version painted every delta green, carried over from a mockup whose invented data only went up. Real pilot data has technical knowledge and resilience rising while time management and ethics fall — and a page that renders all four as success hides exactly the two worth discussing. Green up, red down, grey unchanged, with an explicit sign in front of each so the colour is never the only signal.</p>
+
+    <h3 class="block">First against most recent</h3>
+    <div class="demo col">
+      <div class="comp-demo">
+        <span>Technical knowledge</span>
+        <span><span class="track"><span class="before" style="width:53%"></span></span><span class="track"><span class="after" style="width:61%"></span></span></span>
+        <span class="fig">2,66 → 3,07 <span class="delta-demo up">+0,41</span></span>
+      </div>
+      <div class="comp-demo">
+        <span>Time management</span>
+        <span><span class="track"><span class="before" style="width:58%"></span></span><span class="track"><span class="after down" style="width:52%"></span></span></span>
+        <span class="fig">2,88 → 2,59 <span class="delta-demo down">−0,29</span></span>
+      </div>
+      <div class="comp-demo">
+        <span>Adaptability</span>
+        <span class="suppressed-demo">Withheld — fewer students than the reporting threshold</span>
+        <span></span>
+      </div>
+    </div>
+    <p class="note">Two bars stacked rather than side by side: the reader is comparing one competency with its own past, not with its neighbours. The lower bar turns red when it is shorter than the upper one, so a decline reads at a glance rather than needing the number.
+    <br><br><b>The third row is the normal case, not an edge case.</b> Any group below five students is withheld — these pages carry no names, but an average over two students read by their own teacher is not anonymous. A withheld row <b>keeps its place and states its reason</b>; a row that disappears becomes a zero in somebody's chart, which is a worse lie than saying nothing. The competency names are the school's own words from its own rubric, printed as written and never translated.</p>
+
+    <h3 class="block">Trend</h3>
+    <div class="demo">
+      <div class="trend-demo">
+        <span class="col"><span class="v">11</span><span class="plot"><span class="bar" style="height:65%"></span></span><span class="lab">18 Aug</span></span>
+        <span class="col"><span class="v">16</span><span class="plot"><span class="bar" style="height:94%"></span></span><span class="lab">25 Aug</span></span>
+        <span class="col"><span class="v">0</span><span class="plot"><span class="bar empty"></span></span><span class="lab">1 Sep</span></span>
+        <span class="col"><span class="v">17</span><span class="plot"><span class="bar" style="height:100%"></span></span><span class="lab">8 Sep</span></span>
+      </div>
+    </div>
+    <p class="note"><b>Every bar carries its number</b>, above itself. The first version put the count in a <code class="inline">title</code> tooltip — invisible on a touch screen, unreadable at a glance on any screen, and the first question anyone asked of the chart was "how many is that one".
+    <br><br><b>One colour.</b> An earlier draft painted the last bar solid, inherited from a mockup where it was decoration; on a chart a different colour reads as a different kind of thing, and a reader is right to ask what it means. Bars are width-capped so four buckets do not stretch into four billboards.
+    <br><br><b>Zero draws no ink.</b> There is a minimum bar size so a small but real value stays visible; it applies only above zero. Applied blindly it drew a sliver of blue under a figure that said 0, and the picture disagreed with the number.
+    <br><br>Granularity follows the window — per day up to ten days, per week up to a quarter, per month beyond — because thirty daily bars of single digits is a worse picture than four weekly ones, and a monthly chart over a week is one bar.</p>
+
     <h3 class="block">Period control</h3>
     <div class="demo">
       <span class="period-demo">
@@ -852,6 +963,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
     <p class="note"><b>Three destinations, numbered, and never one.</b> A student cannot reliably classify their own problem, so the sheet does not ask them to — it lists all three with one line each and puts the school first, because that is who knows them. The separation is not tidiness: a single "contact us" address routes erasure requests into an IT inbox with a one-month statutory clock running and nobody there with authority to answer. An entry with no address is <b>omitted entirely</b> rather than shown empty — unlike the privacy notice, a help sheet with <code class="inline">&lt;email&gt;</code> in it is worse than one with two entries.</p>
 
     <h3 class="block">Status &amp; meta chips</h3>
+    <p class="note"><b>A status is a noun, in every language.</b> The data-request table filled its status column from the action buttons, so it read "Mark answered" and "Refuse" — and a cancelled request showed the dismiss label of a modal, which in Serbian meant its status was the words "Not now". Verbs belong on buttons. A status names what a thing <i>is</i>, and needs its own string in each language rather than borrowing one that happens to be nearby.</p>
     <div class="demo">
       <span class="pill status-completed">Completed</span>
       <span class="pill status-in_progress">In progress</span>
@@ -916,6 +1028,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
         <button>Invites</button>
       </div>
     </div>
+    <p class="note"><b>Navigation only — a filter is a select.</b> The statistics period picker was built as a second segmented control and sat directly under the section tabs, so the page opened with two identical rows and nothing to say which moved you and which narrowed what you were looking at. The rule that came out of it: this control changes <i>where you are</i>. Anything that changes <i>what is shown</i> takes a select, which no one mistakes for navigation.</p>
 
     <h3 class="block">Sessions table (teacher)</h3>
     <div class="demo col">
@@ -1495,7 +1608,7 @@ footer{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0 1
   </section>
 
   <footer>
-    RISE — Visual Design Document · v1.3 · 2026-09-14 · Zoran Krnetić (PR BRIGHTNESS)
+    RISE — Visual Design Document · v1.4 · 2026-09-15 · Zoran Krnetić (PR BRIGHTNESS)
   </footer>
 </div>
 </body>

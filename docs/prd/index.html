@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RISE — Platform Requirements (PRD) v2.0</title>
+<title>RISE — Platform Requirements (PRD) v2.1</title>
 <style>
 :root{
   --background:#faf8ff;--surface:#ffffff;--surface-low:#f2f3ff;--surface-container:#eaedff;--surface-high:#e2e7ff;
@@ -593,20 +593,33 @@ Node.js / Express Backend  ──→  Together.ai (Qwen)   (AI feedback)
       <li>The platform's own address is <b>read-only inside a school</b>, for the same reason its default limits are: one address, answered by one team.</li>
     </ul>
 
+    <h3>What the platform can count about itself</h3>
+    <ul class="clean">
+      <li>The grant commits the final report to <b>“quantitative data (e.g. user numbers, performance metrics)”</b> and to key indicators showing measurable improvement. Nothing in the platform could produce any of it: there was no aggregate view at any level, and the only way to answer “how many interviews has Le Caron done” was to open a database console.</li>
+      <li><b>Three sections, for both kinds of administrator.</b> Activity — interviews started and completed, accounts, who actually practised. Utilisation — model calls, tokens, cost and the environmental figures, each recorded at the moment of the call rather than reconstructed afterwards. Progress — a student&rsquo;s first completed interview against their most recent.</li>
+      <li><b>A platform administrator sees every school; a school administrator sees only theirs.</b> The scope is taken from the account, never from the request, so there is no parameter a school administrator could add to widen it.</li>
+      <li><b>Still no transcripts, at any level.</b> Everything these pages return is a count, a sum or a mean over a group. This is the same claim §7.1 rests on, and it holds only while the endpoints stay aggregate — a “drill down to the student” feature would quietly revoke it.</li>
+      <li><b>Groups of fewer than five students are withheld rather than averaged.</b> The pages carry no names, but an average over two students read by their own teacher is not anonymous. Withheld rows stay visible with their reason: a row that disappears becomes a zero in somebody&rsquo;s chart. At current pilot sizes this is the ordinary case, not the exception — every per-school progress row is withheld today.</li>
+      <li><b>Progress is reported as an indicator, not a finding.</b> The comparison is first interview against most recent, same rubric and same model, and the page says on its face that students who improved may simply be those who kept practising, and that the model is scoring its own conversation. A report that quotes the number without the caveat is overstating it.</li>
+      <li><b>The period selects which students are counted, not which of their interviews are compared.</b> A student&rsquo;s first interview is a historical fact that a date filter has no business moving, and scoring a week&rsquo;s work against itself measures nothing.</li>
+      <li><b>Export as five tables and a README</b>, because activity, utilisation and progress have genuinely different shapes and one sheet holding all three cannot be pivoted. Semicolon-delimited with comma decimals, which is how all three partner countries write numbers. The caveats travel inside the file: a spreadsheet opened in six months has no warning box beside it.</li>
+      <li><b>What it deliberately cannot show.</b> The platform holds nothing about who a student is. The inclusion and disadvantage figures the application commits to, and any measure of confidence or satisfaction, come from the schools&rsquo; own records and the project surveys. This page is the quantitative half only, and the report needs both.</li>
+    </ul>
+
     <h3>Still outstanding</h3>
     <p class="lead">Named here so this document is not read as a completion certificate. The current list lives in the work plan.</p>
     <ul class="clean">
-      <li><b>Scheduled backups.</b> Designed, not built. Dumps are taken by hand before releases and at no other time — the most urgent item in the project.</li>
+      <li><b>Scheduled backups on the pilot host.</b> The provisioning script now installs them — a daily dump kept for a fortnight, and an encrypted off-site copy once a bucket is configured — so a new installation has both from its first run. The pilot host predates that script and is still dumped by hand.</li>
       <li><b>Transfer clauses and the impact assessment</b> between the schools, which need three sets of lawyers.</li>
       <li><b>Retention: the deletion job.</b> The numbers are no longer outstanding — each school now sets its own and the notice publishes them. What is missing is the job that honours them: <b>nothing expires today</b>, so a period on that page is a promise the platform does not yet keep by itself.</li>
-      <li><b>A mailbox that receives.</b> The platform support address students are told to write to needs one; the current provider sends only.</li>
+      <li><b>A school&rsquo;s own support address.</b> The platform&rsquo;s address now has a real mailbox behind it, and mail goes through the school&rsquo;s own server rather than a send-only service. What is missing is the schools: none has filled in its own contact, so students are shown the platform&rsquo;s address for the questions — a password, a class, who they are — that only their school can answer.</li>
       <li><b>Migration to the project&rsquo;s own infrastructure</b>, and the sustainability plan the grant requires.</li>
       <li><b>Database-level tenant isolation</b> as a backstop behind the application-level scoping that ships today.</li>
     </ul>
   </section>
 
   <footer>
-    RISE — Platform Requirements Document · v2.0 · 2026-06-29, status updated 2026-09-14 · Zoran Krnetić (PR BRIGHTNESS) · Client: Tehnička škola · <b>Delivered and accepted</b>; see §12 for what came after
+    RISE — Platform Requirements Document · v2.1 · 2026-06-29, status updated 2026-09-15 · Zoran Krnetić (PR BRIGHTNESS) · Client: Tehnička škola · <b>Delivered and accepted</b>; see §12 for what came after
   </footer>
 </div>
 </body>
