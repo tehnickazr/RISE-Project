@@ -86,8 +86,6 @@ pre.out{background:var(--surface-low);color:var(--text-muted);border:1px solid r
   box-shadow:var(--shadow);padding:18px 20px}
 .need h3{color:var(--primary);margin-bottom:4px}
 .need p{font-size:14.5px;color:var(--text-muted);margin:0}
-.need .price{display:block;margin-top:8px;font-size:12px;font-weight:800;letter-spacing:.04em;
-  text-transform:uppercase;color:var(--outline-strong)}
 
 table.kv{border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px}
 table.kv th,table.kv td{text-align:left;vertical-align:top;padding:9px 12px 9px 0;
@@ -155,40 +153,30 @@ as you go.</p>
     <h3>A server</h3>
     <p>Debian&nbsp;12 or Ubuntu&nbsp;22.04 and newer, 2&nbsp;GB of memory, root access over SSH with
     a key. Any provider. Nothing here is specific to one.</p>
-    <span class="price">≈ €5 / month</span>
   </div>
   <div>
     <h3>A name for it</h3>
     <p>A domain or subdomain you control the DNS for. <code>rise.your-school.example</code> is
     perfectly good; it does not need its own domain.</p>
-    <span class="price">≈ €10 / year</span>
   </div>
   <div>
     <h3>A mailbox to send from</h3>
     <p>Any SMTP server. Prefer the school's own: an invitation asking a student to set a password
     should arrive from an address they already recognise.</p>
-    <span class="price">Usually already have one</span>
   </div>
   <div>
     <h3>A language model key</h3>
     <p>Scaleway's Generative APIs by default — the model runs in Paris, so no student answer leaves
     the EU. Billed per token, not per seat.</p>
-    <span class="price">≈ €0.01 per interview</span>
   </div>
   <div>
     <h3>A Google service account</h3>
     <p><em>Optional.</em> Only if teachers will author interviews in Google&nbsp;Sheets. Content can
     be imported from CSV instead.</p>
-    <span class="price">Free</span>
   </div>
 </div>
 
-<p class="muted" style="font-size:14.5px">On the per-interview figure: at Scaleway's list price the
-default model costs €0.25 per million tokens in and €1.50 per million out, and a ten-question
-interview — each answer scored against its rubric, plus a closing summary — comes to roughly one
-euro cent. You do not have to take that on trust. The platform records the token count and the
-computed cost of every single model call, so after a week of real use you can read your own number
-instead of ours.</p>
+<p class="muted" style="font-size:14.5px">Running costs are the server, the domain, and whatever the model provider charges — which is per token used, not per student or per seat, so it scales with how much the platform is actually used. Rather than quote rates that go stale, note that the platform records the token count and the computed cost of every single model call: after a week of real use you can read your own number off your own installation.</p>
 
 <div class="stepno"><span class="n">Step 1</span><h2>Point the name at the machine</h2></div>
 
@@ -219,7 +207,7 @@ record is wrong somewhere; no amount of waiting fixes a typo.</p>
 unprivileged deploy user, PostgreSQL, the application under systemd, nginx, a TLS certificate that
 renews itself, log rotation, and a daily database backup.</p>
 
-<p>Fetch it and read it before you run it. It runs as root, it is 590 lines, and every section says
+<p>Fetch it and read it before you run it. It runs as root, it is some six hundred lines, and every section says
 what it is about to do and why.</p>
 
 <pre><code><span class="c"># on the server, as root</span>
@@ -400,37 +388,226 @@ half-finished edit reaching a class mid-lesson. Imports are versioned, and every
 the version it was taken against, so changing a question can never alter an interview already
 sat.</p>
 
-<div class="stepno"><span class="n">Step 8</span><h2>Three things before students arrive</h2></div>
+<div class="stepno"><span class="n">Step 8</span><h2>Backups</h2></div>
 
-<p>A daily backup is already running — the script took one during provisioning and repeats it at
-02:30. It writes to <code>/var/backups/rise</code> on this machine, which answers <em>somebody
-deleted the wrong class on Tuesday</em>. It does not answer <em>the disk died</em>, because the
-database and every dump are on that same disk.</p>
+<p>A daily backup is already running. The provisioning script took one while it worked and repeats it
+at 02:30, writing to <code>/var/backups/rise</code> with fourteen days kept. That answers <em>somebody
+deleted the wrong class on Tuesday</em>, which is much the likeliest way data is lost.</p>
 
-<h3>1. Add an off-site copy</h3>
-<p>Put any S3-compatible bucket in <code>/etc/rise/backup.env</code> and run it once by hand. Backups
-are encrypted on this machine before they leave it, so the storage provider never holds anything
-readable.</p>
-<pre><code>nano /etc/rise/backup.env
-/usr/local/bin/rise-backup &amp;&amp; restic snapshots</code></pre>
-<p>Use a key that can <strong>write but not delete</strong>. A server able to destroy its own backup
-history is one bad command away from having none.</p>
+<p>It does not answer <em>the disk died</em> or <em>the account was closed</em>, because the database
+and every dump are on the same disk. Closing that is this step, and it needs a bucket.</p>
+
+<h3>Create the bucket</h3>
+
+<p>Any S3-compatible object storage works. We use Scaleway's, in Paris, because the data then stays
+in the same jurisdiction as the platform. The settings that matter:</p>
+
+<div class="scroll"><table class="kv">
+  <tr><th>Visibility</th><td><strong>Private.</strong></td></tr>
+  <tr><th>Versioning</th><td><strong>On.</strong> This is what makes a deletion recoverable.</td></tr>
+  <tr><th>Object lock</th><td><strong>Off</strong> — see below. This one is not obvious.</td></tr>
+  <tr><th>Encryption</th><td>The provider-managed option (Scaleway calls it SSE-ONE). Redundant, since the backup is already encrypted before it leaves the host, but it needs no configuration and is worth the sentence in your records. Avoid customer-managed keys: they add a second way to lose everything.</td></tr>
+</table></div>
 
 <div class="note warn">
-  <span class="lbl">Then copy the password off the server</span>
-  <p><code>RESTIC_PASSWORD</code> in that same file was generated during provisioning, and it is the
-  only thing that makes those backups readable — including by you. It currently lives on the machine
-  the backups exist to protect. Put it in a password manager now.</p>
+  <span class="lbl">Do not enable object lock</span>
+  <p>It looks like exactly what a backup wants — write once, delete never. Two reasons not to.</p>
+  <p>The practical one: restic writes a lock file into the repository on every run and removes it when
+  it finishes, so an immutable bucket eventually blocks its own housekeeping.</p>
+  <p>The one that actually decides it: <strong>a student has the right to erasure.</strong> Under a
+  write-once policy you cannot remove their data from the backups even when you are obliged to, and
+  you get to explain that to a supervisory authority. Versioning gives you the recovery you want
+  while leaving you able to delete things.</p>
 </div>
 
-<h3>2. Switch on machine snapshots</h3>
-<p>In your hosting provider's panel, weekly at least. Nothing running on the host can do this for
-itself, and it answers the failure a database dump cannot: the machine you restore <em>onto</em>.</p>
+<h3>Lifecycle rules</h3>
 
-<h3>3. Check that yesterday's backup happened</h3>
-<p>Not today's — you just watched today's. The one that ran unattended.</p>
+<p>Versioning means nothing is ever really deleted — a delete lays a <em>marker</em> over the object
+and the old version survives underneath it. Without expiry rules, "we keep backups for 90 days"
+quietly becomes "we keep everything forever, including data we told someone we had removed."</p>
+
+<div class="scroll"><table class="kv">
+  <tr><th>Expire non-current versions</th><td><strong>90 days</strong>, retain-count blank.</td></tr>
+  <tr><th>Expire incomplete multipart uploads</th><td><strong>7 days.</strong> Abandoned upload parts are billed but invisible in the file listing.</td></tr>
+  <tr><th>Everything else</th><td><strong>Nothing.</strong></td></tr>
+</table></div>
+
+<div class="note warn">
+  <span class="lbl">The one that will bite you</span>
+  <p>"Expire <em>current</em> versions" and "Expire <em>non-current</em> versions" sit next to each
+  other, one word apart, and the console offers to default both to 90 days. <strong>Current versions
+  are your live backup data.</strong> A rule there deletes the repository from the oldest end, and it
+  fails silently — backups keep running, keep reporting success, and you discover the hole during a
+  restore.</p>
+  <p>The rule to hold onto: lifecycle rules may only ever touch things restic has already finished
+  with. Non-current versions are yesterday's tombstones; abandoned upload parts are litter. Everything
+  else in that bucket is the backup.</p>
+</div>
+
+<p>Transitions to a colder tier are also wrong here, tempting as the pricing looks. restic reads the
+repository index on every run, and an archived object needs a restore request taking hours before it
+can be read at all — so the first backup after the transition simply fails.</p>
+
+<h3>Wire it up</h3>
+
+<p>You need an API key with <strong>both halves</strong> this time — the access key identifies you and
+the secret signs each request. That differs from the inference key in step 3, where only the secret
+mattered, and it is an easy hour to lose.</p>
+
+<pre><code>nano /etc/rise/backup.env</code></pre>
+
+<pre><code>RESTIC_REPOSITORY='s3:s3.fr-par.scw.cloud/your-bucket-name'
+AWS_ACCESS_KEY_ID='...'
+AWS_SECRET_ACCESS_KEY='...'</code></pre>
+
+<p><strong>Change the repository line.</strong> The provisioning script writes a guess there, and a
+guess that points at a bucket you do not own fails on the first unattended run, at half past two,
+when nobody is watching.</p>
+
+<p>Leave <code>RESTIC_PASSWORD</code> alone — it was generated during provisioning, and changing it
+orphans everything encrypted under the old one. Quote all three values: this file is read with
+<code>source</code>, the same trap as <code>SMTP_PASS</code> in step 3.</p>
+
+<p>Then create the repository and run it once by hand:</p>
+
+<pre><code>set -a; source /etc/rise/backup.env; set +a
+restic init
+/usr/local/bin/rise-backup</code></pre>
+
+<pre class="out"><code>created restic repository a8b7974a09 at s3:s3.fr-par.scw.cloud/rise-db-backup
+rise-backup: local ok 2026-09-15T09:20:05+00:00
+Added to the repository: 128.719 KiB (14.969 KiB stored)
+snapshot 27b2154f saved
+rise-backup: off-site ok 2026-09-15T09:20:13+00:00</code></pre>
+
+<p>That <code>restic init</code> succeeding is also your proof that the credentials work, since it had
+to write to the bucket to do it.</p>
+
+<div class="note warn">
+  <span class="lbl">Now copy the password off the server</span>
+  <p><code>RESTIC_PASSWORD</code> is the only thing that makes those backups readable — including by
+  you. It currently exists in exactly one place: a file on the machine the backups exist to protect.
+  Put it in a password manager before you close the terminal. This is the single most common way an
+  off-site backup turns out to have been worthless.</p>
+</div>
+
+<h3>A correction, if you read the script's comments</h3>
+<p>The provisioning script used to advise a key that could <em>write but not delete</em>. That is the
+right instinct and it does not work: restic removes its own lock file at the end of every run, so a
+key without delete permission fails immediately. Versioning plus the expiry rule above is how you
+actually get the property — a delete leaves the real object underneath, recoverable for 90 days.</p>
+
+<h3>Two more things</h3>
+
+<p><strong>Switch on weekly machine snapshots</strong> in your hosting provider's panel. Nothing
+running on the host can do this for itself, and it answers the failure a database dump cannot: the
+machine you restore <em>onto</em>.</p>
+
+<p><strong>Check tomorrow's backup, not today's.</strong> You just watched today's. The one worth
+verifying is the one that ran unattended while you were asleep, and the line to look for is
+<code>off-site ok</code> rather than the "not configured" message it printed before the bucket
+existed.</p>
+
 <pre><code>systemctl list-timers rise-backup --no-pager
 tail /var/log/rise/backup.log</code></pre>
+
+<div class="stepno"><span class="n">Step 9</span><h2>Restore it, before you need to</h2></div>
+
+<p>A backup nobody has restored is a hypothesis. This takes about five minutes, it touches nothing
+live, and it is the only thing that turns a configured backup into a proven one. Do it now, and again
+after any change to the database or the backup configuration.</p>
+
+<h3>Fetch a snapshot from the bucket</h3>
+
+<p>Deliberately from the bucket rather than the local dump — the local copy would not exercise the
+credentials, the encryption, or the download.</p>
+
+<pre><code>set -a; source /etc/rise/backup.env; set +a
+restic snapshots
+WORK=$(mktemp -d); chmod 700 "$WORK"
+restic restore latest --target "$WORK"
+find "$WORK" -type f</code></pre>
+
+<p>Two files come back: <code>rise.dump</code>, the database, and <code>env.backup</code>, a copy of
+the environment file. That second one is there because it is the one thing on the host that cannot be
+reconstructed from anything else — session secret, database password, provider keys.</p>
+
+<h3>Load it into a scratch database</h3>
+
+<div class="note">
+  <span class="lbl">The step that fails the first time</span>
+  <p><code>pg_restore</code> runs as the <code>postgres</code> user, which cannot read into a
+  <code>0700</code> directory owned by root. You get <code>Permission denied</code> and it looks like
+  a broken backup. Hand the file over explicitly instead of loosening the directory — the dump holds
+  student data and belongs at <code>0600</code>.</p>
+</div>
+
+<pre><code>install -o postgres -g postgres -m 600 \
+  "$(find "$WORK" -name rise.dump)" /var/lib/postgresql/restore-test.dump
+
+sudo -u postgres createdb rise_restoretest
+sudo -u postgres pg_restore -d rise_restoretest --no-owner --no-privileges \
+  /var/lib/postgresql/restore-test.dump</code></pre>
+
+<p>Silence from <code>pg_restore</code> means it worked. Now compare the restored database against
+the live one — not just "did it load", but "is the same data in it":</p>
+
+<pre><code>for t in users organizations interview_sessions interview_messages \
+         answer_feedback answer_criterion_scores content_versions \
+         org_settings platform_settings audit_log; do
+  L=$(sudo -u postgres psql -d rise             -tAc "SELECT count(*) FROM $t")
+  R=$(sudo -u postgres psql -d rise_restoretest -tAc "SELECT count(*) FROM $t")
+  [ "$L" = "$R" ] &amp;&amp; M=match || M='*** MISMATCH ***'
+  printf '  %-26s live %-5s restored %-5s %s\n' "$t" "$L" "$R" "$M"
+done</code></pre>
+
+<pre class="out"><code>  users                      live 1     restored 1     match
+  organizations              live 1     restored 1     match
+  interview_sessions         live 0     restored 0     match
+  answer_feedback            live 0     restored 0     match
+  answer_criterion_scores    live 0     restored 0     match
+  content_versions           live 0     restored 0     match
+  org_settings               live 0     restored 0     match
+  platform_settings          live 1     restored 1     match
+  audit_log                  live 0     restored 0     match</code></pre>
+
+<p>Read a row or two as well, not only the counts. A school name with diacritics in it is a good
+choice: an encoding fault survives a row count perfectly happily and shows up the moment you look at
+the text.</p>
+
+<h3>Clean up — this part is not optional</h3>
+
+<p>You have just written a plaintext copy of every secret on the host into a temporary directory, and
+a full copy of the database into a second one.</p>
+
+<pre><code>sudo -u postgres dropdb rise_restoretest
+shred -u /var/lib/postgresql/restore-test.dump
+find "$WORK" -type f -exec shred -u {} \; ; rm -rf "$WORK"</code></pre>
+
+<h3>When it is not a drill</h3>
+
+<p>The same restore, aimed at the real database. Which source you use depends on what went wrong:</p>
+
+<div class="scroll"><table class="kv">
+  <tr><th>Bad delete, host fine</th><td>Use the local dump in <code>/var/backups/rise</code>. No credentials, no download, seconds.</td></tr>
+  <tr><th>Host lost entirely</th><td>Provision a new machine from step 1, then restore from the bucket. You need <code>RESTIC_PASSWORD</code>, which is why it lives in your password manager.</td></tr>
+</table></div>
+
+<p>Restoring over the live database is one command, and it is destructive, so read it twice:</p>
+
+<pre><code>systemctl stop rise
+sudo -u postgres pg_restore -d rise --clean --if-exists --no-owner --no-privileges  path/to/rise.dump
+systemctl start rise</code></pre>
+
+<p><code>--clean</code> drops each object before recreating it. Stopping the service first is not
+politeness: a live connection writing during a restore produces a database that matches neither the
+backup nor what you had.</p>
+
+<p>On a rebuilt host, restore <code>env.backup</code> to
+<code>/opt/apps/rise/shared/.env</code> as well — or at minimum lift
+<code>SESSION_SECRET</code> from it. A new one invalidates every signed-in session on the platform,
+which on a Monday morning means every student and teacher discovering they are logged out at
+once.</p>
 
 <div class="stepno"><span class="n">After</span><h2>Deploying changes</h2></div>
 

@@ -455,10 +455,21 @@ else
 # .env; it needs its own bucket and application key. Any S3-compatible bucket
 # works.
 #
-# Use a key that can WRITE BUT NOT DELETE. A server able to destroy its own
-# backup history is one bad command away from having none — which is how the
-# French and Portuguese glossaries were lost in August. Pruning runs separately,
-# rarely, with an admin key from a laptop.
+# A server able to destroy its own backup history is one bad command away from
+# having none — which is how the French and Portuguese glossaries were lost in
+# August. The obvious defence, a key that can write but not delete, does NOT
+# work: restic takes a lock in the repository on every run and removes it when
+# it finishes, so a key without delete permission fails on the first backup.
+#
+# Get the property from the bucket instead. Turn on VERSIONING, and add a
+# lifecycle rule expiring NON-CURRENT versions after 90 days. A delete then
+# leaves the real object underneath a marker, recoverable for 90 days, while
+# restic's own housekeeping still works.
+#
+# Do NOT enable object lock, and do NOT put a lifecycle rule on current
+# versions: the first blocks erasure requests you are legally obliged to honour,
+# the second deletes the live repository from the oldest end and reports success
+# while doing it. https://riseproject.space/setup covers both.
 RESTIC_REPOSITORY=s3:s3.fr-par.scw.cloud/rise-backups
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
