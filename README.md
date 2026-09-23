@@ -1,11 +1,11 @@
 # RISE — AI Interview Coach
 
-A platform where vocational-school students practise a real job interview in
-their own trade and language, as many times as they need, and get useful
+A platform where vocational-school students practice a real job interview in
+their own trade and language, and get useful
 feedback straight away.
 
 Built for the Erasmus+ project **KA210-VET-778D8F70** by Tehnička škola
-Zrenjanin, Lycée Professionnel Jacques Le Caron and AEVA, and released so that
+Zrenjanin, Lycée Professionnel Jacques Le Caron, AEVA and Marabunta, and released so that
 any school can run it.
 
 - **Four languages** — Serbian, English, French, Portuguese. Not a translated
