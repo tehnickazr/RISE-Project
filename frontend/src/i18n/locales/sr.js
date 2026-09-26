@@ -490,6 +490,11 @@ export default {
     ethics: 'Etika i odgovornost',
     time_management: 'Organizacija i vreme',
     authenticity: 'Autentičnost',
+    client_focus: 'Odnos prema klijentu',
+    adaptability: 'Prilagodljivost',
+    initiative: 'Inicijativa',
+    continuous_learning: 'Stalno učenje',
+    brand_fundamentals: 'Osnove brendiranja',
   },
   notice: {
     first: 'Pre početka, pročitajte kako RISE postupa sa vašim podacima.',

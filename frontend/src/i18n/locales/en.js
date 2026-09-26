@@ -486,6 +486,11 @@ export default {
     ethics: 'Ethics and responsibility',
     time_management: 'Organisation and time',
     authenticity: 'Authenticity',
+    client_focus: 'Client focus',
+    adaptability: 'Adaptability',
+    initiative: 'Initiative',
+    continuous_learning: 'Continuous learning',
+    brand_fundamentals: 'Brand fundamentals',
   },
   notice: {
     first: 'Before you start, please read how RISE handles your data.',

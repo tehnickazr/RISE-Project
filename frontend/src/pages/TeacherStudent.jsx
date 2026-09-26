@@ -8,6 +8,12 @@ import UserMenu from '../components/UserMenu.jsx';
 import ProgressChart from '../components/ProgressChart.jsx';
 import ScoreBar, { formatScore } from '../components/ScoreBar.jsx';
 
+// A preferred order, not a whitelist. Schools write their own rubrics, so a
+// competency outside this list is ordinary — AEVA and Tehnička both use
+// client_focus, adaptability, initiative, continuous_learning and
+// brand_fundamentals. Filtering to these five hid those rows entirely, and
+// hid the whole section for a scenario built only from them, while the same
+// scores stayed visible in the answer feedback and in school statistics.
 const COMPETENCY_ORDER = [
   'technical_knowledge',
   'resilience',
@@ -15,6 +21,14 @@ const COMPETENCY_ORDER = [
   'time_management',
   'authenticity',
 ];
+
+/** Known competencies first, in the order above; anything else after, sorted. */
+function orderCompetencies(keys) {
+  const seen = new Set(keys);
+  const known = COMPETENCY_ORDER.filter((k) => seen.has(k));
+  const rest = [...seen].filter((k) => !COMPETENCY_ORDER.includes(k)).sort();
+  return [...known, ...rest];
+}
 
 function formatDate(ts, locale) {
   if (!ts) return '';
@@ -93,7 +107,7 @@ export default function TeacherStudent() {
     if (scored.length < 2) return [];
     const firstSession = data.competencies[scored[0].id] ?? {};
     const lastSession = data.competencies[scored[scored.length - 1].id] ?? {};
-    return COMPETENCY_ORDER
+    return orderCompetencies([...Object.keys(firstSession), ...Object.keys(lastSession)])
       .filter((key) => firstSession[key] != null || lastSession[key] != null)
       .map((key) => ({
         key,
