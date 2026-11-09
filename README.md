@@ -79,6 +79,23 @@ Deploys after that are one command, run deliberately:
 ssh deploy@your-server 'bash /opt/apps/rise/current/deploy/deploy-production.sh'
 ```
 
+That script runs **on** the server and deploys **that** server — whichever
+branch its checkout is on. It cannot reach anywhere else, which is why the same
+script serves every environment.
+
+If you run more than one environment, `deploy/remote.sh` calls it for you from
+your own machine, so nobody has to log in to deploy:
+
+```bash
+deploy/remote.sh staging      # branch `staging`
+deploy/remote.sh production   # branch `main`, with a typed confirmation
+```
+
+It prints the commit the server will actually fetch, warns when your local
+branch is ahead of what you pushed, and takes `--force` for the case where a
+checkout was moved by hand. Set `RISE_STAGING_HOST` and `RISE_PRODUCTION_HOST`
+to your own hostnames — the built-in defaults are ours.
+
 ## The database
 
 `backend/schema.sql` is the whole database in one file, and
