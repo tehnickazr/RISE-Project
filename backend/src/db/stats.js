@@ -305,10 +305,12 @@ export async function progress(orgId, win) {
  * Suppressed per row, not as a block. The first draft did it as a block, on the
  * reasoning that every competency describes the same students — which is false
  * here and real data said so immediately. Each school writes its own rubric, so
- * the competencies are not shared: production has seven, of which two
- * (`adaptability`, `continuous_learning`) belong to a single student's scenario
- * and five belong to eleven to twenty-one students. Block suppression on the
- * smallest cohort blanked the entire table.
+ * the competencies are not shared: of the five in the measurable set on
+ * production, four are scored for all ten students and `resilience` for three.
+ * Block suppression on the smallest cohort blanked the entire table.
+ *
+ * The figures in this paragraph used to read "eleven to twenty-one students".
+ * They were copied from the count below, which was counting sessions.
  *
  * Rows are returned sorted by cohort size, largest first, so the competencies
  * with something to say are not below a screenful of withheld ones.
@@ -341,13 +343,20 @@ export async function progressByCompetency(orgId, win) {
          FROM scored
      )
      SELECT competency,
-            count(*)::int  AS students,
+            -- DISTINCT because this CTE holds one row per student PER SESSION:
+            -- counting rows reports a student once for every interview they
+            -- sat. The other two progress queries collapse to a
+            -- one-row-per-student CTE before counting, so a plain count(*) is
+            -- correct there and wrong here. The number is not merely wrong on
+            -- the page either: it is what suppress() is given, so a cohort of
+            -- three counted as six went straight through the threshold of five.
+            count(DISTINCT student_id)::int  AS students,
             avg(score) FILTER (WHERE asc_n = 1)::numeric  AS first_score,
             avg(score) FILTER (WHERE desc_n = 1)::numeric AS latest_score
        FROM ranked
       WHERE n >= 2
       GROUP BY competency
-      ORDER BY count(*) DESC, competency`,
+      ORDER BY count(DISTINCT student_id) DESC, competency`,
     s.params
   );
 
